@@ -4,7 +4,7 @@ import jax
 import numpy as np
 from scipy.integrate import odeint
 
-from slimRL.environments.viewer import Viewer
+from slimfqi.environments.viewer import Viewer
 
 
 class CarOnHill:
