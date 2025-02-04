@@ -29,6 +29,7 @@ def run(argvs=sys.argv[1:]):
         stack_size=4,
         compress=True,
     )
+    rb.load("PATH HERE", iteration=None)
     agent = DQN(
         q_key,
         (env.state_height, env.state_width, env.n_stacked_frames),
