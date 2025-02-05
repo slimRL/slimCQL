@@ -75,9 +75,9 @@ class FixedReplayBuffer(object):
             if replay_buffer is not None:
                 self._replay_buffers.append(replay_buffer)
 
-    def sample_transition_batch(self, batch_size=None, indices=None):
+    def sample(self, size=None):
         buffer_index = np.random.randint(self._num_replay_buffers)
-        return self._replay_buffers[buffer_index].sample_transition_batch(batch_size=batch_size, indices=indices)
+        return self._replay_buffers[buffer_index].sample(size=size)
 
     def reload_data(self):
         if self.replay_checkpoint is None:
