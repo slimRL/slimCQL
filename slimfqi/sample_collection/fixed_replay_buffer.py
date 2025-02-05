@@ -47,9 +47,13 @@ class FixedReplayBuffer(object):
         replay_buffer = ReplayBuffer(*self._args, **self._kwargs)
         replay_buffer.load(self.data_dir, checkpoint)
         print(len(replay_buffer._memory))
-        # check that load loads all 1M transitions (irrespective of replay_capacity value)
-        # if replay capacity is less than a million, need to take only [replay_transitions_start_index: replay_transitions_start_index+replay_capacity+stack_size]
-
+        print(len(replay_buffer._replay_buffer_capacity))
+       
+        replay_buffer._memory = replay_buffer._memory[self.replay_transitions_start_index: self.replay_transitions_start_index+replay_buffer.replay_capacity].copy()
+        print(len(replay_buffer._memory))
+        print(len(replay_buffer._replay_buffer_capacity))
+       
+        
         if replay_buffer is not None:
             self._replay_buffers = [replay_buffer]
         return replay_buffer
