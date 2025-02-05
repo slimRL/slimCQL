@@ -65,8 +65,6 @@ class FixedReplayBuffer(object):
         print(len(replay_buffer._memory))
         print(replay_buffer._replay_buffer_capacity)
 
-        if replay_buffer is not None:
-            self._replay_buffers = [replay_buffer]
         return replay_buffer
 
     def _get_checkpoint_indices(self, replay_file_start_index, replay_file_end_index):
