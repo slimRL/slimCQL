@@ -76,7 +76,7 @@ class FixedReplayBuffer(object):
                 self._replay_buffers.append(replay_buffer)
 
     def sample(self, size=None):
-        buffer_index = np.random.randint(self._num_replay_buffers)
+        buffer_index = np.random.randint(len(self._replay_buffers))
         return self._replay_buffers[buffer_index].sample(size=size)
 
     def reload_data(self):
