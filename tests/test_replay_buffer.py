@@ -169,7 +169,8 @@ class ReplayBufferTest(parameterized.TestCase):
         # Verify we sample the expected indices by using the same rng state.
         self._rng_key = np.random.default_rng(seed=0)
         indices = self._rng_key.integers(
-            len(rb._sampling_distribution._index_to_key), size=len(rb._sampling_distribution._index_to_key)
+            len(rb._sampling_distribution._index_to_key),
+            size=len(rb._sampling_distribution._index_to_key),
         )
 
         def make_state(key: int):
@@ -206,7 +207,11 @@ class ReplayBufferTest(parameterized.TestCase):
         for i in range(rb._max_capacity):
             rb.add(
                 TransitionElement(
-                    np.full(OBSERVATION_SHAPE, i), action=i * 2, reward=i, is_terminal=i == 3, episode_end=False
+                    np.full(OBSERVATION_SHAPE, i),
+                    action=i * 2,
+                    reward=i,
+                    is_terminal=i == 3,
+                    episode_end=False,
                 )
             )
         # Verify we sample the expected indices, using the same rng.

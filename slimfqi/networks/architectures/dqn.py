@@ -40,15 +40,28 @@ class DQNNet(nn.Module):
             initializer = nn.initializers.xavier_uniform()
             idx_feature_start = 3
             x = nn.relu(
-                nn.Conv(features=self.features[0], kernel_size=(8, 8), strides=(4, 4), kernel_init=initializer)(
-                    jnp.array(x, ndmin=4) / 255.0
-                )
+                nn.Conv(
+                    features=self.features[0],
+                    kernel_size=(8, 8),
+                    strides=(4, 4),
+                    kernel_init=initializer,
+                )(jnp.array(x, ndmin=4) / 255.0)
             )
             x = nn.relu(
-                nn.Conv(features=self.features[1], kernel_size=(4, 4), strides=(2, 2), kernel_init=initializer)(x)
+                nn.Conv(
+                    features=self.features[1],
+                    kernel_size=(4, 4),
+                    strides=(2, 2),
+                    kernel_init=initializer,
+                )(x)
             )
             x = nn.relu(
-                nn.Conv(features=self.features[2], kernel_size=(3, 3), strides=(1, 1), kernel_init=initializer)(x)
+                nn.Conv(
+                    features=self.features[2],
+                    kernel_size=(3, 3),
+                    strides=(1, 1),
+                    kernel_init=initializer,
+                )(x)
             )
             x = x.reshape((x.shape[0], -1))
         elif self.architecture_type == "impala":

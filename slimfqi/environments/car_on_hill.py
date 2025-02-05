@@ -6,7 +6,8 @@ from scipy.integrate import odeint
 
 from slimfqi.environments.viewer import Viewer
 
-CAR_ON_HILL_DEFAULT_HORIZON=200
+CAR_ON_HILL_DEFAULT_HORIZON = 200
+
 
 class CarOnHill:
     """
@@ -30,7 +31,7 @@ class CarOnHill:
         self._viewer = Viewer(1, 1)
         self.observation_shape = (2,)
         self.n_actions = 2
-    
+
     @property
     def observation(self) -> np.ndarray:
         return np.copy(self.state)

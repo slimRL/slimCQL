@@ -261,7 +261,10 @@ class ReplayBuffer(checkpointers.Checkpointable):
         trajectory_steps = (
             []
             if not trajectory_leaves
-            else [trajectory_leaves, *map(trajectory_treedef.flatten_up_to, trajectory_steps)]
+            else [
+                trajectory_leaves,
+                *map(trajectory_treedef.flatten_up_to, trajectory_steps),
+            ]
         )
 
         return {
@@ -272,7 +275,10 @@ class ReplayBuffer(checkpointers.Checkpointable):
                 "treedef": pickle.dumps(memory_treedef),
             },
             "sampling_distribution": self._sampling_distribution.to_state_dict(),
-            "transitions": {"trajectory": trajectory_steps, "treedef": pickle.dumps(trajectory_treedef)},
+            "transitions": {
+                "trajectory": trajectory_steps,
+                "treedef": pickle.dumps(trajectory_treedef),
+            },
         }
 
     def from_state_dict(self, state_dict: dict[str, Any]) -> None:

@@ -6,7 +6,11 @@ def test_launch_local():
     assert returncode > 0, "The command should have raised an error telling that the experiment name is not specified."
 
     returncode = subprocess.run(
-        ["launch_job/car_on_hill/local_fqi.sh", "--experiment_name", "_test_launch_local"]
+        [
+            "launch_job/car_on_hill/local_fqi.sh",
+            "--experiment_name",
+            "_test_launch_local",
+        ]
     ).returncode
     assert returncode > 0, "The command should have raised an error telling that the first seed is not specified."
 

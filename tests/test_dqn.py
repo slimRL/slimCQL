@@ -13,7 +13,13 @@ class TestDQN(unittest.TestCase):
         self.random_seed = np.random.randint(1000)
         self.key = jax.random.PRNGKey(self.random_seed)
 
-        key_actions, key_feature_1, key_feature_2, key_feature_3, key_feature_4 = jax.random.split(self.key, 5)
+        (
+            key_actions,
+            key_feature_1,
+            key_feature_2,
+            key_feature_3,
+            key_feature_4,
+        ) = jax.random.split(self.key, 5)
         self.observation_dim = (84, 84, 4)
         self.n_actions = int(jax.random.randint(key_actions, (), minval=2, maxval=10))
         self.q = DQN(

@@ -30,7 +30,11 @@ class AtariEnv:
         ).env
 
         self.n_actions = self.env.action_space.n
-        self.original_state_height, self.original_state_width, _ = self.env.observation_space._shape
+        (
+            self.original_state_height,
+            self.original_state_width,
+            _,
+        ) = self.env.observation_space._shape
         self.screen_buffer = [
             np.empty((self.original_state_height, self.original_state_width), dtype=np.uint8),
             np.empty((self.original_state_height, self.original_state_width), dtype=np.uint8),
@@ -84,6 +88,10 @@ class AtariEnv:
 
     def resize(self):
         return np.asarray(
-            cv2.resize(self.screen_buffer[0], (self.state_width, self.state_height), interpolation=cv2.INTER_AREA),
+            cv2.resize(
+                self.screen_buffer[0],
+                (self.state_width, self.state_height),
+                interpolation=cv2.INTER_AREA,
+            ),
             dtype=np.uint8,
         )

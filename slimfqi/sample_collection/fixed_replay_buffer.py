@@ -19,10 +19,10 @@ class FixedReplayBuffer(object):
         n_buffers_to_load,
         *args,
         replay_checkpoint=None,
-        replay_file_start_index=0,  # to change between exploratory vs. expert data
+        replay_file_start_index=0,
         replay_file_end_index=None,
         **kwargs
-    ):
+    ):  # to change between exploratory vs. expert data
         # For individual ReplayBuffer object parameters
         self._args = args
         self._kwargs = kwargs

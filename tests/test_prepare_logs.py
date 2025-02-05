@@ -7,7 +7,8 @@ from experiments.base.utils import prepare_logs
 
 def test_prepare_logs():
     save_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "../experiments/car_on_hill/exp_output/_test_prepare_logs"
+        os.path.dirname(os.path.abspath(__file__)),
+        "../experiments/car_on_hill/exp_output/_test_prepare_logs",
     )
     if os.path.exists(save_path):
         shutil.rmtree(save_path)
@@ -15,7 +16,15 @@ def test_prepare_logs():
     # Create folders and parameters.json with seed = 1 -> should not throw an error
     try:
         prepare_logs(
-            "car_on_hill", "fqi", ["--experiment_name", "_test_prepare_logs", "--seed", "1", "--disable_wandb"]
+            "car_on_hill",
+            "fqi",
+            [
+                "--experiment_name",
+                "_test_prepare_logs",
+                "--seed",
+                "1",
+                "--disable_wandb",
+            ],
         )
     except Exception as e:
         assert 0, f"The exception {type(e).__name__} is raised. Exception: {e}"
@@ -27,7 +36,15 @@ def test_prepare_logs():
     # Create folders and parameters.json with seed = 2 -> should not throw an error
     try:
         prepare_logs(
-            "car_on_hill", "fqi", ["--experiment_name", "_test_prepare_logs", "--seed", "2", "--disable_wandb"]
+            "car_on_hill",
+            "fqi",
+            [
+                "--experiment_name",
+                "_test_prepare_logs",
+                "--seed",
+                "2",
+                "--disable_wandb",
+            ],
         )
     except Exception as e:
         assert 0, f"The exception {type(e).__name__} is raised. Exception: {e}"
@@ -35,7 +52,15 @@ def test_prepare_logs():
     # Create again folders and parameters.json with seed = 1 -> should throw an error
     try:
         prepare_logs(
-            "car_on_hill", "fqi", ["--experiment_name", "_test_prepare_logs", "--seed", "1", "--disable_wandb"]
+            "car_on_hill",
+            "fqi",
+            [
+                "--experiment_name",
+                "_test_prepare_logs",
+                "--seed",
+                "1",
+                "--disable_wandb",
+            ],
         )
         assert 0, "An error saying that this experiment has been run with the same seed should have been thrown."
     except Exception as e:

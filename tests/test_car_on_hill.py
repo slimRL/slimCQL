@@ -7,7 +7,8 @@ import unittest
 class TestCarOnHill(unittest.TestCase):
     def test_fqi(self):
         save_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "../experiments/car_on_hill/exp_output/_test_fqi"
+            os.path.dirname(os.path.abspath(__file__)),
+            "../experiments/car_on_hill/exp_output/_test_fqi",
         )
         print("SAVE PATH IS ", save_path)
         if os.path.exists(save_path):

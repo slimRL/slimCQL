@@ -29,7 +29,8 @@ def get_iqm_and_conf(scores):
         scores = scores[np.newaxis]
 
     iqm, ci_lower, ci_upper = np.vectorize(get_epoch_iqm_and_conf, signature="(j),(n,m)-> (),(),()")(
-        jax.random.split(jax.random.PRNGKey(0), scores.shape[-1]), scores.transpose((2, 0, 1))
+        jax.random.split(jax.random.PRNGKey(0), scores.shape[-1]),
+        scores.transpose((2, 0, 1)),
     )
 
     return iqm, np.stack([ci_lower, ci_upper])
