@@ -79,6 +79,23 @@ def train_and_eval(
         eval_episode_lengths_per_iteration,
     )
 
+    avg_return = np.mean(eval_episode_returns_per_iteration[idx_iteration])
+    avg_length_episode = np.mean(eval_episode_lengths_per_iteration[idx_iteration])
+    n_episodes = len(eval_episode_lengths_per_iteration[idx_iteration])
+    print(
+        f"\Iteration 0: Return {avg_return} averaged on {n_episodes} episodes.\n",
+        flush=True,
+    )
+
+    p["wandb"].log(
+        {
+            "iteration": 0,
+            "n_training_steps": n_training_steps,
+            "avg_return": avg_return,
+            "avg_length_episode": avg_length_episode,
+        }
+    )
+
     eval_episode_returns_per_iteration.append([0])
     eval_episode_lengths_per_iteration.append([0])
 
@@ -114,7 +131,7 @@ def train_and_eval(
 
         p["wandb"].log(
             {
-                "iteration": idx_iteration,
+                "iteration": idx_iteration + 1,
                 "n_training_steps": n_training_steps,
                 "avg_return": avg_return,
                 "avg_length_episode": avg_length_episode,
