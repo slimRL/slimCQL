@@ -38,16 +38,18 @@ class FixedReplayBuffer(object):
 
         self._replay_indices = self._get_checkpoint_indices(replay_file_start_index, replay_file_end_index)
 
+        if replay_checkpoint is not None:
+            self.load_single_buffer(replay_checkpoint)
+
     def load_single_buffer(self, checkpoint):
         """Load a specific checkpoint"""
-        try:
-            replay_buffer = ReplayBuffer(*self._args, **self._kwargs)
-            replay_buffer.load(self._data_dir, checkpoint)
-            print(len(replay_buffer._memory))
-            # check that load loads all 1M transitions (irrespective of replay_capacity value)
-            # if replay capacity is less than a million, need to take only [replay_transitions_start_index: replay_transitions_start_index+replay_capacity+stack_size]
-        except Exception:
-            return None
+
+        replay_buffer = ReplayBuffer(*self._args, **self._kwargs)
+        replay_buffer.load(self._data_dir, checkpoint)
+        print(len(replay_buffer._memory))
+        # check that load loads all 1M transitions (irrespective of replay_capacity value)
+        # if replay capacity is less than a million, need to take only [replay_transitions_start_index: replay_transitions_start_index+replay_capacity+stack_size]
+
         if replay_buffer is not None:
             self._replay_buffers = [replay_buffer]
         return replay_buffer
