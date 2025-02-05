@@ -84,13 +84,13 @@ class FixedReplayBuffer(object):
     def _load_replay_buffers(self):
         """Loads multiple checkpoints into a list of replay buffers"""
         replay_ckpts = np.random.choice(self._replay_indices, self.n_buffers_to_load, replace=False)
+        print(self._replay_indices)
+        print(replay_ckpts)
         self._replay_buffers = []
         with futures.ThreadPoolExecutor(max_workers=self.n_buffers_to_load) as thread_pool_executor:
             replay_futures = [thread_pool_executor.submit(self.load_single_buffer, ckpt) for ckpt in replay_ckpts]
         for f in replay_futures:
-            replay_buffer = f.result()
-            if replay_buffer is not None:
-                self._replay_buffers.append(replay_buffer)
+            self._replay_buffers.append(f.result())
 
     def sample(self, size=None):
         buffer_index = np.random.randint(len(self._replay_buffers))
