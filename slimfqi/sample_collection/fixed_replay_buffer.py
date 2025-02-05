@@ -50,7 +50,7 @@ class FixedReplayBuffer(object):
         print(replay_buffer._replay_buffer_capacity)
 
         replay_buffer._memory = replay_buffer._memory[
-            self.replay_transitions_start_index : self.replay_transitions_start_index + replay_buffer.replay_capacity
+            self.replay_transitions_start_index : self.replay_transitions_start_index + replay_buffer._replay_buffer_capacity
         ].copy()
         print(len(replay_buffer._memory))
         print(replay_buffer._replay_buffer_capacity)
