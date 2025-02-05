@@ -23,8 +23,14 @@ def run(argvs=sys.argv[1:]):
 
     env = AtariEnv(p["experiment_name"].split("_")[-1])
     rb = FixedReplayBuffer(
+        data_dir=p["data_dir"],
+        n_buffers_to_load=p["n_buffers_to_load"],
+        replay_checkpoint=p["replay_checkpoint"],
+        replay_file_start_index=p["replay_file_start_index"],
+        replay_file_end_index=p["replay_file_end_index"],
+        replay_transitions_start_index=p["replay_transitions_start_index"],
         sampling_distribution=UniformSamplingDistribution(p["seed"]),
-        max_capacity=p["replay_buffer_capacity"],
+        replay_buffer_capacity=p["replay_buffer_capacity"],
         batch_size=p["batch_size"],
         update_horizon=p["update_horizon"],
         gamma=p["gamma"],

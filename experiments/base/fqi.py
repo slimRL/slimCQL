@@ -32,7 +32,7 @@ def evaluation_per_iteration(
     env.reset()
     has_reset = False
 
-    while n_episode_steps < p["n_training_steps_per_epoch"] or not has_reset:
+    while n_episode_steps < p["max_steps_per_episode"] or not has_reset:
         key, action_key = jax.random.split(key)
         action = select_action(
             agent.best_action,
@@ -44,6 +44,8 @@ def evaluation_per_iteration(
         ).item()
 
         reward, absorbing = env.step(action)
+
+        n_episode_steps += 1
 
         episode_end = absorbing or env.n_steps >= p["max_steps_per_episode"]
         if episode_end:
@@ -73,12 +75,11 @@ def train_and_eval(
         fixed_rb.reload_data()
 
         for _ in range(p["n_fitting_steps"]):
-            if n_training_steps > p["n_initial_samples"]:
-                agent.update_online_params(n_training_steps, fixed_rb)
-                target_updated, logs = agent.update_target_params(n_training_steps)
+            agent.update_online_params(n_training_steps, fixed_rb)
+            target_updated, logs = agent.update_target_params(n_training_steps)
 
-                if target_updated:
-                    p["wandb"].log({"n_training_steps": n_training_steps, **logs})
+            if target_updated:
+                p["wandb"].log({"n_training_steps": n_training_steps, **logs})
 
         evaluation_per_iteration(
             key,

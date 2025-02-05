@@ -98,13 +98,69 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         default="fc",
         choices=["cnn", "impala", "fc"],
     )
+    parser.add_argument(
+        "-dd",
+        "--data_dir",
+        help="Path to dataset.",
+        type=str,
+        required=True,
+    )
+    parser.add_argument(
+        "-nbtl",
+        "--n_buffers_to_load",
+        help="Number of buffers to load.",
+        type=int,
+        required=True,
+    )
+    parser.add_argument(
+        "-rc",
+        "--replay_checkpoint",
+        help="Specific checkpoint to load (keep n_buffers_to_load=1).",
+        type=int,
+        default=None,
+    )
+    parser.add_argument(
+        "-rfsi",
+        "--replay_file_start_index",
+        help="Replay file start index.",
+        type=int,
+        default=0,
+    )
+    parser.add_argument(
+        "-rfei",
+        "--replay_file_end_index",
+        help="Replay file end index.",
+        type=int,
+        default=None,
+    )
+    parser.add_argument(
+        "-rtsi",
+        "--replay_transitions_start_index",
+        help="Replay transitions start index.",
+        type=int,
+        default=0,
+    )
+    parser.add_argument(
+        "-mspe",
+        "--max_steps_per_episode",
+        help="Max. steps per episode in evaluation.",
+        type=int,
+        default=27_000,
+    )
+    parser.add_argument(
+        "-ee",
+        "--epsilon_eval",
+        help="Epsilon to use for evaluation.",
+        type=float,
+        default=0.001,
+    )
 
 
 @output_added_arguments
 def add_fqi_arguments(parser: argparse.ArgumentParser):
     parser.add_argument(
-        "-nbi",
-        "--n_bellman_iterations",
+        "-ni",
+        "--n_iterations",
         help="Number of Bellman iterations to perform.",
         type=int,
         default=30,

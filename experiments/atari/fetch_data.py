@@ -27,7 +27,7 @@ def transform_single_checkpoint(idx_checkpoint, data_dir):
     rb = ReplayBuffer(
         sampling_distribution=UniformSamplingDistribution(seed=0),
         batch_size=32,
-        max_capacity=1_000_000,
+        replay_buffer_capacity=1_000_000,
         stack_size=4,
         update_horizon=1,
         gamma=0.99,

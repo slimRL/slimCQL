@@ -11,7 +11,7 @@ class SamplersTest(parameterized.TestCase):
     def setUp(self):
         super().setUp()
         self.uniform_sampler = samplers.UniformSamplingDistribution(seed=0)
-        self.prioritized_sampler = samplers.PrioritizedSamplingDistribution(seed=0, max_capacity=10)
+        self.prioritized_sampler = samplers.PrioritizedSamplingDistribution(seed=0, replay_buffer_capacity=10)
 
     def test_prioritized_sample(self):
         keys = [0, 1, 2, 3, 4]

@@ -64,7 +64,7 @@ class ReplayBufferTest(parameterized.TestCase):
         rb = replay_buffer.ReplayBuffer(
             sampling_distribution=samplers.UniformSamplingDistribution(seed=0),
             batch_size=BATCH_SIZE,
-            max_capacity=capacity,
+            replay_buffer_capacity=capacity,
             stack_size=STACK_SIZE,
             update_horizon=1,
             gamma=1.0,
@@ -102,7 +102,7 @@ class ReplayBufferTest(parameterized.TestCase):
         rb = replay_buffer.ReplayBuffer(
             sampling_distribution=samplers.UniformSamplingDistribution(seed=0),
             batch_size=BATCH_SIZE,
-            max_capacity=10,
+            replay_buffer_capacity=10,
             stack_size=STACK_SIZE,
             update_horizon=5,
             gamma=1.0,
@@ -124,7 +124,7 @@ class ReplayBufferTest(parameterized.TestCase):
         rb = replay_buffer.ReplayBuffer(
             sampling_distribution=samplers.UniformSamplingDistribution(seed=0),
             batch_size=BATCH_SIZE,
-            max_capacity=50,
+            replay_buffer_capacity=50,
             stack_size=STACK_SIZE,
             update_horizon=5,
             gamma=1.0,
@@ -150,7 +150,7 @@ class ReplayBufferTest(parameterized.TestCase):
         rb = replay_buffer.ReplayBuffer(
             sampling_distribution=samplers.UniformSamplingDistribution(seed=0),
             batch_size=2,
-            max_capacity=10,
+            replay_buffer_capacity=10,
             stack_size=1,
             update_horizon=1,
             gamma=0.99,
@@ -198,13 +198,13 @@ class ReplayBufferTest(parameterized.TestCase):
         rb = replay_buffer.ReplayBuffer(
             sampling_distribution=samplers.UniformSamplingDistribution(seed=0),
             batch_size=2,
-            max_capacity=10,
+            replay_buffer_capacity=10,
             stack_size=1,
             update_horizon=3,
             gamma=1.0,
             compress=False,
         )
-        for i in range(rb._max_capacity):
+        for i in range(rb._replay_buffer_capacity):
             rb.add(
                 TransitionElement(
                     np.full(OBSERVATION_SHAPE, i),
@@ -248,7 +248,7 @@ class ReplayBufferTest(parameterized.TestCase):
         rb = replay_buffer.ReplayBuffer(
             sampling_distribution=samplers.UniformSamplingDistribution(seed=0),
             batch_size=BATCH_SIZE,
-            max_capacity=capacity,
+            replay_buffer_capacity=capacity,
             stack_size=1,
             update_horizon=1,
             gamma=0.99,
@@ -325,7 +325,7 @@ class ReplayBufferTest(parameterized.TestCase):
         replay = replay_buffer.ReplayBuffer(
             sampling_distribution=self._sampling_distribution,
             batch_size=batch_size,
-            max_capacity=replay_capacity,
+            replay_buffer_capacity=replay_capacity,
             stack_size=stack_size,
             update_horizon=update_horizon,
             gamma=gamma,
@@ -355,7 +355,7 @@ class ReplayBufferTest(parameterized.TestCase):
         replay = replay_buffer.ReplayBuffer(
             sampling_distribution=self._sampling_distribution,
             batch_size=8,
-            max_capacity=10,
+            replay_buffer_capacity=10,
             checkpoint_duration=cd,
         )
         num_adds = 20
@@ -375,7 +375,7 @@ class ReplayBufferTest(parameterized.TestCase):
         replay = replay_buffer.ReplayBuffer(
             sampling_distribution=self._sampling_distribution,
             batch_size=8,
-            max_capacity=10,
+            replay_buffer_capacity=10,
             stack_size=4,
             update_horizon=update_horizon,
             gamma=0.99,
@@ -404,7 +404,7 @@ class ReplayBufferTest(parameterized.TestCase):
         replay = replay_buffer.ReplayBuffer(
             sampling_distribution=self._sampling_distribution,
             batch_size=batch_size,
-            max_capacity=capacity,
+            replay_buffer_capacity=capacity,
             stack_size=2,
             update_horizon=1,
             gamma=0.99,
@@ -422,7 +422,7 @@ class ReplayBufferTest(parameterized.TestCase):
             replay = replay_buffer.ReplayBuffer(
                 sampling_distribution=self._sampling_distribution,
                 batch_size=batch_size,
-                max_capacity=capacity,
+                replay_buffer_capacity=capacity,
                 stack_size=2,
                 update_horizon=1,
                 gamma=0.99,

@@ -21,6 +21,7 @@ class FixedReplayBuffer(object):
         replay_checkpoint=None,
         replay_file_start_index=0,
         replay_file_end_index=None,
+        replay_transitions_start_index=0,
         **kwargs
     ):  # to change between exploratory vs. expert data
         # For individual ReplayBuffer object parameters
@@ -41,7 +42,7 @@ class FixedReplayBuffer(object):
         self._replay_indices = self._get_checkpoint_indices(replay_file_start_index, replay_file_end_index)
 
         while not self._loaded_buffers:
-            if replay_checkpoint:
+            if replay_checkpoint is not None:
                 self.load_single_buffer(replay_checkpoint)
             else:
                 self._load_replay_buffers()
@@ -51,6 +52,10 @@ class FixedReplayBuffer(object):
         try:
             replay_buffer = ReplayBuffer(*self._args, **self._kwargs)
             replay_buffer.load(self._data_dir, checkpoint)
+            print(len(replay_buffer._memory))
+            # check that load loads all 1M transitions (irrespective of replay_capacity value)
+            # if replay capacity is less than a million, need to take only [replay_transitions_start_index: replay_transitions_start_index+replay_capacity+stack_size]
+
         except Exception:
             return None
         if replay_buffer is not None:
@@ -89,6 +94,6 @@ class FixedReplayBuffer(object):
         return self._replay_buffers[buffer_index].sample_transition_batch(batch_size=batch_size, indices=indices)
 
     def reload_data(self):
-        if not self._replay_checkpoint:
+        if self._replay_checkpoint is None:
             self._loaded_buffers = False
             self._load_replay_buffers()

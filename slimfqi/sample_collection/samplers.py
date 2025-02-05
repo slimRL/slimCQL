@@ -74,12 +74,12 @@ class PrioritizedSamplingDistribution(UniformSamplingDistribution):
     def __init__(
         self,
         seed: int,
-        max_capacity: int,
+        replay_buffer_capacity: int,
         priority_exponent: float = 1.0,
     ) -> None:
-        self._max_capacity = max_capacity
+        self._replay_buffer_capacity = replay_buffer_capacity
         self._priority_exponent = priority_exponent
-        self._sum_tree = sum_tree.SumTree(self._max_capacity)
+        self._sum_tree = sum_tree.SumTree(self._replay_buffer_capacity)
         super().__init__(seed=seed)
 
     def add(self, key: ReplayItemID, priority: float) -> None:

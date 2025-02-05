@@ -78,7 +78,7 @@ class ReplayBuffer(checkpointers.Checkpointable):
         self,
         sampling_distribution,
         batch_size: int,
-        max_capacity: int,
+        replay_buffer_capacity: int,
         stack_size: int = 4,
         update_horizon: int = 1,
         gamma: float = 0.99,
@@ -87,7 +87,7 @@ class ReplayBuffer(checkpointers.Checkpointable):
         clipping: callable = None,
     ):
         self.add_count = 0
-        self._max_capacity = max_capacity
+        self._replay_buffer_capacity = replay_buffer_capacity
         self._compress = compress
         self._memory = collections.OrderedDict[ReplayItemID, ReplayElement]()
 
@@ -210,7 +210,7 @@ class ReplayBuffer(checkpointers.Checkpointable):
             self._memory[key] = replay_element
             self._sampling_distribution.add(key, **kwargs)
             self.add_count += 1
-            if self.add_count > self._max_capacity:
+            if self.add_count > self._replay_buffer_capacity:
                 oldest_key, _ = self._memory.popitem(last=False)
                 self._sampling_distribution.remove(oldest_key)
 
