@@ -47,8 +47,8 @@ def evaluation_per_iteration(
 
         n_evaluation_steps_iteration += 1
 
-        episode_end = absorbing or env.n_steps >= p["max_steps_per_episode"]
-        if episode_end:
+        has_reset = absorbing or env.n_steps >= p["max_steps_per_episode"]
+        if has_reset:
             env.reset()
 
         eval_episode_returns_per_iteration[idx_iteration][-1] += reward
