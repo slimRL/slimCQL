@@ -74,7 +74,7 @@ def train_and_eval(
         agent,
         env,
         p,
-        idx_iteration,
+        0,
         eval_episode_returns_per_iteration,
         eval_episode_lengths_per_iteration,
     )
@@ -96,7 +96,7 @@ def train_and_eval(
             agent,
             env,
             p,
-            idx_iteration,
+            idx_iteration + 1,
             eval_episode_returns_per_iteration,
             eval_episode_lengths_per_iteration,
         )
