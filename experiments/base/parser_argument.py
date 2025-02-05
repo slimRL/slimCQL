@@ -99,6 +99,13 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         choices=["cnn", "impala", "fc"],
     )
     parser.add_argument(
+        "-tuf",
+        "--target_update_frequency",
+        help="Number of training steps before updating the target Q-network.",
+        type=int,
+        default=2000,
+    )
+    parser.add_argument(
         "-dd",
         "--data_dir",
         help="Path to dataset.",
@@ -146,6 +153,13 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         help="Max. steps per episode in evaluation.",
         type=int,
         default=27_000,
+    )
+    parser.add_argument(
+        "-nespi",
+        "--n_evaluation_steps_per_iteration",
+        help="Evaluation steps per iteration.",
+        type=int,
+        default=125_000,
     )
     parser.add_argument(
         "-ee",

@@ -28,11 +28,11 @@ def evaluation_per_iteration(
     eval_episode_returns_per_iteration,
     eval_episode_lengths_per_iteration,
 ):
-    n_episode_steps = 0
+    n_evaluation_steps_iteration = 0
     env.reset()
     has_reset = False
 
-    while n_episode_steps < p["max_steps_per_episode"] or not has_reset:
+    while n_evaluation_steps_iteration < p["n_evaluation_steps_per_iteration"] or not has_reset:
         key, action_key = jax.random.split(key)
         action = select_action(
             agent.best_action,
@@ -45,7 +45,7 @@ def evaluation_per_iteration(
 
         reward, absorbing = env.step(action)
 
-        n_episode_steps += 1
+        n_evaluation_steps_iteration += 1
 
         episode_end = absorbing or env.n_steps >= p["max_steps_per_episode"]
         if episode_end:
@@ -53,7 +53,7 @@ def evaluation_per_iteration(
 
         eval_episode_returns_per_iteration[idx_iteration][-1] += reward
         eval_episode_lengths_per_iteration[idx_iteration][-1] += 1
-        if has_reset and n_episode_steps < p["max_steps_per_episode"]:
+        if has_reset and n_evaluation_steps_iteration < p["n_evaluation_steps_per_iteration"]:
             eval_episode_returns_per_iteration[idx_iteration].append(0)
             eval_episode_lengths_per_iteration[idx_iteration].append(0)
 
@@ -77,6 +77,8 @@ def train_and_eval(
         for _ in range(p["n_fitting_steps"]):
             agent.update_online_params(n_training_steps, fixed_rb)
             target_updated, logs = agent.update_target_params(n_training_steps)
+            
+            n_training_steps +=1
 
             if target_updated:
                 p["wandb"].log({"n_training_steps": n_training_steps, **logs})
