@@ -4,6 +4,8 @@
 
 import os
 from concurrent import futures
+from collections import OrderedDict
+from itertools import islice
 import numpy as np
 
 from slimfqi.sample_collection.replay_buffer import ReplayBuffer
@@ -49,9 +51,13 @@ class FixedReplayBuffer(object):
         print(len(replay_buffer._memory))
         print(replay_buffer._replay_buffer_capacity)
 
-        replay_buffer._memory = replay_buffer._memory[
-            self.replay_transitions_start_index : self.replay_transitions_start_index + replay_buffer._replay_buffer_capacity
-        ].copy()
+        replay_buffer._memory = OrderedDict(
+            islice(
+                replay_buffer._memory.items(),
+                self.replay_transitions_start_index,
+                self.replay_transitions_start_index + replay_buffer._replay_buffer_capacity,
+            )
+        )
         print(len(replay_buffer._memory))
         print(replay_buffer._replay_buffer_capacity)
 
