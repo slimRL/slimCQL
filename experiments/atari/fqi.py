@@ -9,7 +9,6 @@ from experiments.base.utils import prepare_logs
 from slimfqi.environments.atari import AtariEnv
 from slimfqi.networks.dqn import DQN
 from slimfqi.sample_collection.fixed_replay_buffer import FixedReplayBuffer
-from slimfqi.sample_collection.samplers import UniformSamplingDistribution
 
 
 def run(argvs=sys.argv[1:]):
@@ -29,7 +28,6 @@ def run(argvs=sys.argv[1:]):
         replay_file_start_index=p["replay_file_start_index"],
         replay_file_end_index=p["replay_file_end_index"],
         replay_transitions_start_index=p["replay_transitions_start_index"],
-        sampling_distribution=UniformSamplingDistribution(p["seed"]),
         replay_buffer_capacity=p["replay_buffer_capacity"],
         batch_size=p["batch_size"],
         update_horizon=p["update_horizon"],
@@ -37,6 +35,7 @@ def run(argvs=sys.argv[1:]):
         clipping=lambda x: np.clip(x, -1, 1),
         stack_size=4,
         compress=True,
+        sampler_seed=p["seed"],
     )
     agent = DQN(
         q_key,

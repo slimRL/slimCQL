@@ -8,7 +8,8 @@ from collections import OrderedDict
 from itertools import islice
 import numpy as np
 
-from slimfqi.sample_collection.replay_buffer import ReplayBuffer, ReplayItemID, ReplayElement
+from slimfqi.sample_collection.replay_buffer import ReplayBuffer
+from slimfqi.sample_collection.samplers import UniformSamplingDistribution
 
 
 class FixedReplayBuffer(object):
@@ -18,6 +19,7 @@ class FixedReplayBuffer(object):
         self,
         data_dir,
         n_buffers_to_load,
+        sampler_seed,
         *args,
         replay_checkpoint=None,
         replay_file_start_index=0,
@@ -33,6 +35,7 @@ class FixedReplayBuffer(object):
         self.replay_checkpoint = replay_checkpoint  # to load a specific checkpoint replay buffer
         self.n_buffers_to_load = n_buffers_to_load
         self.replay_transitions_start_index = replay_transitions_start_index
+        self.sampler_seed = sampler_seed
 
         assert not self.replay_checkpoint or (
             self.replay_checkpoint and self.n_buffers_to_load == 1
@@ -46,14 +49,16 @@ class FixedReplayBuffer(object):
     def load_single_buffer(self, checkpoint):
         """Load a specific checkpoint"""
 
-        replay_buffer = ReplayBuffer(*self._args, **self._kwargs)
+        replay_buffer = ReplayBuffer(
+            sampling_distribution=UniformSamplingDistribution(self.sampler_seed), *self._args, **self._kwargs
+        )
         replay_buffer.load(self.data_dir, checkpoint)
 
         replay_transitions_end_index = min(
             self.replay_transitions_start_index + replay_buffer._replay_buffer_capacity, len(replay_buffer._memory)
         )
 
-        replay_buffer._memory = OrderedDict[ReplayItemID, ReplayElement](
+        replay_buffer._memory = OrderedDict(
             islice(replay_buffer._memory.items(), self.replay_transitions_start_index, replay_transitions_end_index)
         )
         replay_buffer._sampling_distribution._index_to_key = list(
@@ -77,10 +82,10 @@ class FixedReplayBuffer(object):
     def _load_replay_buffers(self):
         """Loads multiple checkpoints into a list of replay buffers"""
         replay_ckpts = np.random.choice(self._replay_indices, self.n_buffers_to_load, replace=False)
-        print(replay_ckpts)
         self._replay_buffers = []
         with futures.ThreadPoolExecutor(max_workers=self.n_buffers_to_load) as thread_pool_executor:
             replay_futures = [thread_pool_executor.submit(self.load_single_buffer, ckpt) for ckpt in replay_ckpts]
+
         for f in replay_futures:
             self._replay_buffers.append(f.result())
 
