@@ -69,7 +69,15 @@ def train_and_eval(
     eval_episode_returns_per_iteration = [[0]]
     eval_episode_lengths_per_iteration = [[0]]
 
-    evaluation_per_iteration(key, agent, env)
+    evaluation_per_iteration(
+        key,
+        agent,
+        env,
+        p,
+        idx_iteration,
+        eval_episode_returns_per_iteration,
+        eval_episode_lengths_per_iteration,
+    )
 
     for idx_iteration in tqdm(range(p["n_iterations"])):
         fixed_rb.reload_data()
@@ -77,8 +85,8 @@ def train_and_eval(
         for _ in range(p["n_fitting_steps"]):
             agent.update_online_params(n_training_steps, fixed_rb)
             target_updated, logs = agent.update_target_params(n_training_steps)
-            
-            n_training_steps +=1
+
+            n_training_steps += 1
 
             if target_updated:
                 p["wandb"].log({"n_training_steps": n_training_steps, **logs})
