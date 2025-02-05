@@ -58,6 +58,10 @@ class FixedReplayBuffer(object):
                 self.replay_transitions_start_index + replay_buffer._replay_buffer_capacity,
             )
         )
+        replay_buffer._sampling_distribution._index_to_key = list(replay_buffer._memory.keys())
+        replay_buffer._sampling_distribution._key_to_index = {
+            key: index for index, key in enumerate(replay_buffer._sampling_distribution._index_to_key)
+        }
         print(len(replay_buffer._memory))
         print(replay_buffer._replay_buffer_capacity)
 
