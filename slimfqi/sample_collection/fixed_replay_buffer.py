@@ -22,8 +22,7 @@ class FixedReplayBuffer(object):
         replay_file_end_index=None,
         replay_transitions_start_index=0,
         **kwargs
-    ):  # to change between exploratory vs. expert data
-        # For individual ReplayBuffer object parameters
+    ):
         self._args = args
         self._kwargs = kwargs
 
