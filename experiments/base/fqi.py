@@ -79,9 +79,9 @@ def train_and_eval(
         eval_episode_lengths_per_iteration,
     )
 
-    avg_return = np.mean(eval_episode_returns_per_iteration[idx_iteration])
-    avg_length_episode = np.mean(eval_episode_lengths_per_iteration[idx_iteration])
-    n_episodes = len(eval_episode_lengths_per_iteration[idx_iteration])
+    avg_return = np.mean(eval_episode_returns_per_iteration[0])
+    avg_length_episode = np.mean(eval_episode_lengths_per_iteration[0])
+    n_episodes = len(eval_episode_lengths_per_iteration[0])
     print(
         f"\Iteration 0: Return {avg_return} averaged on {n_episodes} episodes.\n",
         flush=True,
