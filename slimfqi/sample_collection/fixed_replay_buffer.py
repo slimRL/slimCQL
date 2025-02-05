@@ -49,11 +49,14 @@ class FixedReplayBuffer(object):
         replay_buffer = ReplayBuffer(*self._args, **self._kwargs)
         replay_buffer.load(self.data_dir, checkpoint)
 
+        replay_transitions_end_index = min(
+            self.replay_transitions_start_index + replay_buffer._replay_buffer_capacity, len(replay_buffer._memory)
+        )
         replay_buffer._memory = OrderedDict(
             islice(
                 replay_buffer._memory.items(),
                 self.replay_transitions_start_index,
-                self.replay_transitions_start_index + replay_buffer._replay_buffer_capacity,
+                replay_transitions_end_index,
             )
         )
         replay_buffer._sampling_distribution._index_to_key = list(replay_buffer._memory.keys())
