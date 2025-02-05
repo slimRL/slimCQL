@@ -45,7 +45,7 @@ class FixedReplayBuffer(object):
         """Load a specific checkpoint"""
 
         replay_buffer = ReplayBuffer(*self._args, **self._kwargs)
-        replay_buffer.load(self._data_dir, checkpoint)
+        replay_buffer.load(self.data_dir, checkpoint)
         print(len(replay_buffer._memory))
         # check that load loads all 1M transitions (irrespective of replay_capacity value)
         # if replay capacity is less than a million, need to take only [replay_transitions_start_index: replay_transitions_start_index+replay_capacity+stack_size]
