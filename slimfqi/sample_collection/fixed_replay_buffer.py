@@ -52,17 +52,15 @@ class FixedReplayBuffer(object):
         replay_transitions_end_index = min(
             self.replay_transitions_start_index + replay_buffer._replay_buffer_capacity, len(replay_buffer._memory)
         )
-        replay_buffer._memory = OrderedDict(
-            islice(
-                replay_buffer._memory.items(),
-                self.replay_transitions_start_index,
-                replay_transitions_end_index,
-            )
+
+        sliced_keys = list(
+            islice(replay_buffer._memory.items(), self.replay_transitions_start_index, replay_transitions_end_index)
         )
-        replay_buffer._sampling_distribution._index_to_key = list(replay_buffer._memory.keys())
-        replay_buffer._sampling_distribution._key_to_index = {
-            key: index for index, key in enumerate(replay_buffer._sampling_distribution._index_to_key)
-        }
+
+        replay_buffer._memory = OrderedDict((key, self._memory[key]) for key in sliced_keys)
+        replay_buffer._sampling_distribution._index_to_key = list(
+            replay_buffer._memory.keys()
+        )  # only this matters for sampling
 
         return replay_buffer
 
@@ -81,6 +79,7 @@ class FixedReplayBuffer(object):
     def _load_replay_buffers(self):
         """Loads multiple checkpoints into a list of replay buffers"""
         replay_ckpts = np.random.choice(self._replay_indices, self.n_buffers_to_load, replace=False)
+        print(replay_ckpts)
         self._replay_buffers = []
         with futures.ThreadPoolExecutor(max_workers=self.n_buffers_to_load) as thread_pool_executor:
             replay_futures = [thread_pool_executor.submit(self.load_single_buffer, ckpt) for ckpt in replay_ckpts]
