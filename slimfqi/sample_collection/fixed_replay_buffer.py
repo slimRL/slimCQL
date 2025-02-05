@@ -31,6 +31,7 @@ class FixedReplayBuffer(object):
 
         self.replay_checkpoint = replay_checkpoint  # to load a specific checkpoint replay buffer
         self.n_buffers_to_load = n_buffers_to_load
+        self.replay_transitions_start_index = replay_transitions_start_index
 
         assert not self.replay_checkpoint or (
             self.replay_checkpoint and self.n_buffers_to_load == 1
