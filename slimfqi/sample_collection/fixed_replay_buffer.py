@@ -8,7 +8,7 @@ from collections import OrderedDict
 from itertools import islice
 import numpy as np
 
-from slimfqi.sample_collection.replay_buffer import ReplayBuffer
+from slimfqi.sample_collection.replay_buffer import ReplayBuffer, ReplayItemID, ReplayElement
 
 
 class FixedReplayBuffer(object):
@@ -53,7 +53,7 @@ class FixedReplayBuffer(object):
             self.replay_transitions_start_index + replay_buffer._replay_buffer_capacity, len(replay_buffer._memory)
         )
 
-        replay_buffer._memory = OrderedDict(
+        replay_buffer._memory = OrderedDict[ReplayItemID, ReplayElement](
             islice(replay_buffer._memory.items(), self.replay_transitions_start_index, replay_transitions_end_index)
         )
         replay_buffer._sampling_distribution._index_to_key = list(
