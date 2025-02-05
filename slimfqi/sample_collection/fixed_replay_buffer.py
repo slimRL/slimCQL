@@ -47,13 +47,14 @@ class FixedReplayBuffer(object):
         replay_buffer = ReplayBuffer(*self._args, **self._kwargs)
         replay_buffer.load(self.data_dir, checkpoint)
         print(len(replay_buffer._memory))
-        print(len(replay_buffer._replay_buffer_capacity))
-       
-        replay_buffer._memory = replay_buffer._memory[self.replay_transitions_start_index: self.replay_transitions_start_index+replay_buffer.replay_capacity].copy()
+        print(replay_buffer._replay_buffer_capacity)
+
+        replay_buffer._memory = replay_buffer._memory[
+            self.replay_transitions_start_index : self.replay_transitions_start_index + replay_buffer.replay_capacity
+        ].copy()
         print(len(replay_buffer._memory))
-        print(len(replay_buffer._replay_buffer_capacity))
-       
-        
+        print(replay_buffer._replay_buffer_capacity)
+
         if replay_buffer is not None:
             self._replay_buffers = [replay_buffer]
         return replay_buffer

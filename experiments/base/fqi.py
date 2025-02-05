@@ -79,6 +79,9 @@ def train_and_eval(
         eval_episode_lengths_per_iteration,
     )
 
+    eval_episode_returns_per_iteration.append([0])
+    eval_episode_lengths_per_iteration.append([0])
+
     for idx_iteration in tqdm(range(p["n_iterations"])):
         fixed_rb.reload_data()
 
