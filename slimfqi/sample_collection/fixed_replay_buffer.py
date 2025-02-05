@@ -53,11 +53,9 @@ class FixedReplayBuffer(object):
             self.replay_transitions_start_index + replay_buffer._replay_buffer_capacity, len(replay_buffer._memory)
         )
 
-        sliced_keys = list(
+        replay_buffer._memory = OrderedDict(
             islice(replay_buffer._memory.items(), self.replay_transitions_start_index, replay_transitions_end_index)
         )
-
-        replay_buffer._memory = OrderedDict((key, replay_buffer._memory[key]) for key in sliced_keys)
         replay_buffer._sampling_distribution._index_to_key = list(
             replay_buffer._memory.keys()
         )  # only this matters for sampling
