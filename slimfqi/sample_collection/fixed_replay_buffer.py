@@ -3,7 +3,6 @@
 """Logged Replay Buffer."""
 
 import os
-import collections
 from concurrent import futures
 import numpy as np
 
@@ -33,19 +32,11 @@ class FixedReplayBuffer(object):
         self.replay_checkpoint = replay_checkpoint  # to load a specific checkpoint replay buffer
         self.n_buffers_to_load = n_buffers_to_load
 
-        self._loaded_buffers = False
-
         assert not self.replay_checkpoint or (
             self.replay_checkpoint and self.n_buffers_to_load == 1
         ), "When providing a checkpoint, n_buffers_to_load should be 1"
 
         self._replay_indices = self._get_checkpoint_indices(replay_file_start_index, replay_file_end_index)
-
-        while not self._loaded_buffers:
-            if replay_checkpoint is not None:
-                self.load_single_buffer(replay_checkpoint)
-            else:
-                self._load_replay_buffers()
 
     def load_single_buffer(self, checkpoint):
         """Load a specific checkpoint"""
@@ -55,12 +46,10 @@ class FixedReplayBuffer(object):
             print(len(replay_buffer._memory))
             # check that load loads all 1M transitions (irrespective of replay_capacity value)
             # if replay capacity is less than a million, need to take only [replay_transitions_start_index: replay_transitions_start_index+replay_capacity+stack_size]
-
         except Exception:
             return None
         if replay_buffer is not None:
             self._replay_buffers = [replay_buffer]
-            self._loaded_buffers = True
         return replay_buffer
 
     def _get_checkpoint_indices(self, replay_file_start_index, replay_file_end_index):
@@ -77,17 +66,14 @@ class FixedReplayBuffer(object):
 
     def _load_replay_buffers(self):
         """Loads multiple checkpoints into a list of replay buffers"""
-        if not self._loaded_buffers:
-            replay_ckpts = np.random.choice(self._replay_indices, self.n_buffers_to_load, replace=False)
-            self._replay_buffers = []
-            with futures.ThreadPoolExecutor(max_workers=self.n_buffers_to_load) as thread_pool_executor:
-                replay_futures = [thread_pool_executor.submit(self.load_single_buffer, ckpt) for ckpt in replay_ckpts]
-            for f in replay_futures:
-                replay_buffer = f.result()
-                if replay_buffer is not None:
-                    self._replay_buffers.append(replay_buffer)
-            if len(self._replay_buffers):
-                self._loaded_buffers = True
+        replay_ckpts = np.random.choice(self._replay_indices, self.n_buffers_to_load, replace=False)
+        self._replay_buffers = []
+        with futures.ThreadPoolExecutor(max_workers=self.n_buffers_to_load) as thread_pool_executor:
+            replay_futures = [thread_pool_executor.submit(self.load_single_buffer, ckpt) for ckpt in replay_ckpts]
+        for f in replay_futures:
+            replay_buffer = f.result()
+            if replay_buffer is not None:
+                self._replay_buffers.append(replay_buffer)
 
     def sample_transition_batch(self, batch_size=None, indices=None):
         buffer_index = np.random.randint(self._num_replay_buffers)
@@ -95,5 +81,4 @@ class FixedReplayBuffer(object):
 
     def reload_data(self):
         if self._replay_checkpoint is None:
-            self._loaded_buffers = False
             self._load_replay_buffers()
