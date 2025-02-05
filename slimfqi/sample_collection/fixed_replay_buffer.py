@@ -61,7 +61,7 @@ class FixedReplayBuffer(object):
             replay_file_end_index = len(all_ckpts)
         replay_ckpts = all_ckpts[replay_file_start_index:replay_file_end_index]
         if len(replay_ckpts) == 1:
-            self._replay_checkpoint = replay_ckpts[0]
+            self.replay_checkpoint = replay_ckpts[0]
         return replay_ckpts
 
     def _load_replay_buffers(self):
@@ -80,5 +80,5 @@ class FixedReplayBuffer(object):
         return self._replay_buffers[buffer_index].sample_transition_batch(batch_size=batch_size, indices=indices)
 
     def reload_data(self):
-        if self._replay_checkpoint is None:
+        if self.replay_checkpoint is None:
             self._load_replay_buffers()
