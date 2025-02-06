@@ -74,8 +74,8 @@ class CQL:
         return params, optimizer_state, loss
 
     def loss_on_batch(self, params: FrozenDict, params_target: FrozenDict, samples):
-        q_values = jax.vmap(self.compute_q, in_axes=(None, None, 0))(params, samples)
-        q_targets = jax.vmap(self.compute_target, in_axes=(None, None, 0))(params_target, samples)
+        q_values = jax.vmap(self.compute_q, in_axes=(None, 0))(params, samples)
+        q_targets = jax.vmap(self.compute_target, in_axes=(None, 0))(params_target, samples)
         chosen_actions = jax.vmap(lambda x: x.action)(samples)
         replay_chosen_q = jax.vmap(lambda x, y: x[y])(q_values, chosen_actions)
 
