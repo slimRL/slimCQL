@@ -83,7 +83,7 @@ def train_and_eval(
     avg_length_episode = np.mean(eval_episode_lengths_per_iteration[0])
     n_episodes = len(eval_episode_lengths_per_iteration[0])
     print(
-        f"\Iteration 0: Return {avg_return} averaged on {n_episodes} episodes.\n",
+        f"\nIteration 0: Return {avg_return} averaged on {n_episodes} episodes.\n",
         flush=True,
     )
 
@@ -106,10 +106,10 @@ def train_and_eval(
             agent.update_online_params(n_training_steps, fixed_rb)
             target_updated, logs = agent.update_target_params(n_training_steps)
 
-            n_training_steps += 1
-
             if target_updated:
                 p["wandb"].log({"n_training_steps": n_training_steps, **logs})
+            
+            n_training_steps += 1
 
         evaluation_per_iteration(
             key,
@@ -125,7 +125,7 @@ def train_and_eval(
         avg_length_episode = np.mean(eval_episode_lengths_per_iteration[idx_iteration])
         n_episodes = len(eval_episode_lengths_per_iteration[idx_iteration])
         print(
-            f"\Iteration {idx_iteration}: Return {avg_return} averaged on {n_episodes} episodes.\n",
+            f"\nIteration {idx_iteration}: Return {avg_return} averaged on {n_episodes} episodes.\n",
             flush=True,
         )
 
