@@ -42,7 +42,7 @@ def evaluation_per_iteration(
             env.n_actions,
             p["epsilon_eval"],
         ).item()
-        print(f"Eval action = {action}")
+        # print(f"Eval action = {action}")
 
         reward, absorbing = env.step(action)
 
