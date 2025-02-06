@@ -112,15 +112,7 @@ def store_params(p: dict, shared_params: List[str], agent_params: List[str]):
     json.dump(ordered_params_dict, open(params_path, "w"), indent=4)
 
 
-def save_data(p: dict, episode_returns: list, episode_lengths: list, model):
-    os.makedirs(os.path.join(p["save_path"], "episode_returns_and_lengths"), exist_ok=True)
-    episode_returns_and_lengths_path = os.path.join(p["save_path"], f"episode_returns_and_lengths/{p['seed']}.json")
-    os.makedirs(os.path.join(p["save_path"], "models"), exist_ok=True)
-    model_path = os.path.join(p["save_path"], f"models/{p['seed']}")
-
-    json.dump(
-        {"episode_lengths": episode_lengths, "episode_returns": episode_returns},
-        open(episode_returns_and_lengths_path, "w"),
-        indent=4,
-    )
+def save_model(p: dict, model, idx_iteration):
+    os.makedirs(os.path.join(p["save_path"], f"models/{p['seed']}"), exist_ok=True)
+    model_path = os.path.join(p["save_path"], f"models/{p['seed']}/{idx_iteration}")
     pickle.dump(model, open(model_path, "wb"))

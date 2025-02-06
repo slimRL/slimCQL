@@ -147,27 +147,6 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         type=int,
         default=0,
     )
-    parser.add_argument(
-        "-mspe",
-        "--max_steps_per_episode",
-        help="Max. steps per episode in evaluation.",
-        type=int,
-        default=27_000,
-    )
-    parser.add_argument(
-        "-nespi",
-        "--n_evaluation_steps_per_iteration",
-        help="Evaluation steps per iteration.",
-        type=int,
-        default=125_000,
-    )
-    parser.add_argument(
-        "-ee",
-        "--epsilon_eval",
-        help="Epsilon to use for evaluation.",
-        type=float,
-        default=0.001,
-    )
 
 
 @output_added_arguments

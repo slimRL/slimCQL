@@ -4,7 +4,7 @@ import sys
 import jax
 import numpy as np
 
-from experiments.base.fqi import train_and_eval
+from experiments.base.fqi import train
 from experiments.base.utils import prepare_logs
 from slimfqi.environments.atari import AtariEnv
 from slimfqi.networks.dqn import DQN
@@ -18,7 +18,7 @@ def run(argvs=sys.argv[1:]):
     )
     p = prepare_logs(env_name, algo_name, argvs)
 
-    q_key, train_key = jax.random.split(jax.random.PRNGKey(p["seed"]))
+    q_key, key = jax.random.split(jax.random.PRNGKey(p["seed"]))
 
     env = AtariEnv(p["experiment_name"].split("_")[-1])
     rb = FixedReplayBuffer(
@@ -50,7 +50,7 @@ def run(argvs=sys.argv[1:]):
         target_update_frequency=p["target_update_frequency"],
         adam_eps=1.5e-4,
     )
-    train_and_eval(train_key, p, agent, env, rb)
+    train(p, agent, rb)
 
 
 if __name__ == "__main__":
