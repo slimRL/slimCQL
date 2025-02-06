@@ -187,3 +187,24 @@ def add_fqi_arguments(parser: argparse.ArgumentParser):
         type=int,
         default=5,
     )
+
+
+@output_added_arguments
+def add_cql_arguments(parser: argparse.ArgumentParser):
+    parser.add_argument("-acql", "--alpha_cql", help="Weighting parameter of CQL.", type=float, default=0.1)
+
+    parser.add_argument(
+        "-ni",
+        "--n_iterations",
+        help="Number of Bellman iterations to perform.",
+        type=int,
+        default=30,
+    )
+
+    parser.add_argument(
+        "-nfs",
+        "--n_fitting_steps",
+        help="Number of gradient update steps per Bellman iteration.",
+        type=int,
+        default=5,
+    )
