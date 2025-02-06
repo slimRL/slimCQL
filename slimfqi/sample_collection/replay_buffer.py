@@ -222,6 +222,7 @@ class ReplayBuffer(checkpointers.Checkpointable):
             size = self._batch_size
 
         samples = self._sampling_distribution.sample(size)
+        print(f"Samples sampled = {samples}")
         replay_elements = operator.itemgetter(*samples)(self._memory)
         if not isinstance(replay_elements, tuple):
             replay_elements = (replay_elements,)
@@ -229,6 +230,7 @@ class ReplayBuffer(checkpointers.Checkpointable):
             replay_elements = map(operator.methodcaller("unpack"), replay_elements)
 
         batch = jax.tree_util.tree_map(lambda *xs: np.stack(xs), *replay_elements)
+        print(f"Batch details = {batch}")
         return batch
 
     def update(

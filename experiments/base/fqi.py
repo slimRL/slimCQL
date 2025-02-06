@@ -42,17 +42,18 @@ def evaluation_per_iteration(
             env.n_actions,
             p["epsilon_eval"],
         ).item()
+        print(f"Eval action = {action}")
 
         reward, absorbing = env.step(action)
 
         n_evaluation_steps_iteration += 1
+        eval_episode_returns_per_iteration[idx_iteration][-1] += reward
+        eval_episode_lengths_per_iteration[idx_iteration][-1] += 1
 
         has_reset = absorbing or env.n_steps >= p["max_steps_per_episode"]
         if has_reset:
             env.reset()
 
-        eval_episode_returns_per_iteration[idx_iteration][-1] += reward
-        eval_episode_lengths_per_iteration[idx_iteration][-1] += 1
         if has_reset and n_evaluation_steps_iteration < p["n_evaluation_steps_per_iteration"]:
             eval_episode_returns_per_iteration[idx_iteration].append(0)
             eval_episode_lengths_per_iteration[idx_iteration].append(0)
@@ -68,9 +69,11 @@ def train_and_eval(
     n_training_steps = 0
     eval_episode_returns_per_iteration = [[0]]
     eval_episode_lengths_per_iteration = [[0]]
+    
+    key, eval_key = jax.random.split(key)
 
     evaluation_per_iteration(
-        key,
+        eval_key,
         agent,
         env,
         p,
@@ -111,8 +114,9 @@ def train_and_eval(
 
             n_training_steps += 1
 
+        key, eval_key = jax.random.split(key)
         evaluation_per_iteration(
-            key,
+            eval_key,
             agent,
             env,
             p,
