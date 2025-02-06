@@ -108,7 +108,7 @@ def train_and_eval(
 
             if target_updated:
                 p["wandb"].log({"n_training_steps": n_training_steps, **logs})
-            
+
             n_training_steps += 1
 
         evaluation_per_iteration(
