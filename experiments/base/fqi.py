@@ -69,7 +69,7 @@ def train_and_eval(
     n_training_steps = 0
     eval_episode_returns_per_iteration = [[0]]
     eval_episode_lengths_per_iteration = [[0]]
-    
+
     key, eval_key = jax.random.split(key)
 
     evaluation_per_iteration(
@@ -102,7 +102,7 @@ def train_and_eval(
     eval_episode_returns_per_iteration.append([0])
     eval_episode_lengths_per_iteration.append([0])
 
-    for idx_iteration in tqdm(range(p["n_iterations"])):
+    for idx_iteration in tqdm(range(1, p["n_iterations"] + 1)):
         fixed_rb.reload_data()
 
         for _ in range(p["n_fitting_steps"]):
@@ -120,7 +120,7 @@ def train_and_eval(
             agent,
             env,
             p,
-            idx_iteration + 1,
+            idx_iteration,
             eval_episode_returns_per_iteration,
             eval_episode_lengths_per_iteration,
         )
@@ -135,14 +135,14 @@ def train_and_eval(
 
         p["wandb"].log(
             {
-                "iteration": idx_iteration + 1,
+                "iteration": idx_iteration,
                 "n_training_steps": n_training_steps,
                 "avg_return": avg_return,
                 "avg_length_episode": avg_length_episode,
             }
         )
 
-        if idx_iteration < p["n_iterations"] - 1:
+        if idx_iteration < p["n_iterations"]:
             eval_episode_returns_per_iteration.append([0])
             eval_episode_lengths_per_iteration.append([0])
 
