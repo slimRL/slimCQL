@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-from slimRL.environments.car_on_hill import CarOnHill
+from slimfqi.environments.car_on_hill import CarOnHill
 from experiments.car_on_hill.optimal import NX, NV
 
 

@@ -4,7 +4,9 @@ import jax
 import numpy as np
 from scipy.integrate import odeint
 
-from slimRL.environments.viewer import Viewer
+from slimfqi.environments.viewer import Viewer
+
+CAR_ON_HILL_DEFAULT_HORIZON = 200
 
 
 class CarOnHill:
@@ -30,6 +32,10 @@ class CarOnHill:
         self.observation_shape = (2,)
         self.n_actions = 2
 
+    @property
+    def observation(self) -> np.ndarray:
+        return np.copy(self.state)
+
     def reset(self, state=None, **kwargs):
         if state is None:
             self.state = np.array([-0.5, 0])
@@ -37,8 +43,6 @@ class CarOnHill:
             self.state = state
 
         self.n_steps = 0
-
-        return self.state
 
     def step(self, action):
         self.n_steps += 1
@@ -58,7 +62,7 @@ class CarOnHill:
             reward = 0.0
             absorbing = False
 
-        return self.state, reward, absorbing
+        return reward, absorbing
 
     @staticmethod
     def _angle(x):

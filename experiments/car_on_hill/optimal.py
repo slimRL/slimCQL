@@ -4,7 +4,7 @@ import os
 import sys
 import argparse
 import numpy as np
-from slimRL.environments.solvers.car_on_hill import compute_optimal_values
+from slimfqi.environments.solvers.car_on_hill import compute_optimal_values
 
 NX, NV = 17, 17
 
