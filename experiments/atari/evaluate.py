@@ -103,6 +103,18 @@ def evaluate(key, q, p, args):
         process.start()
     for process in processes:
         process.join()
+    results = {"returns": eval_episode_returns_per_iteration, "episode_lengths": eval_episode_lengths_per_iteration}
+    os.makedirs(
+        f"experiments/{p['shared_parameters']['experiment_name'].split('_')[-1]}/exp_output/{args.experiment_name}/{args.algo_name}/results",
+        exist_ok=True,
+    )
+    pickle.dump(
+        results,
+        open(
+            f"experiments/{p['shared_parameters']['experiment_name'].split('_')[-1]}/exp_output/{args.experiment_name}/{args.algo_name}/results/{args.seed}_results.pkl",
+            "wb",
+        ),
+    )
 
 
 def run(argvs=sys.argv[1:]):
