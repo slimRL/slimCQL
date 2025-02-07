@@ -111,9 +111,9 @@ def evaluate(key, q, p, args):
         process.start()
     for process in processes:
         process.join()
-    results = {"returns": eval_episode_returns, "episode_lengths": eval_episode_lengths}
+    results = {"returns": list(eval_episode_returns), "episode_lengths": list(eval_episode_lengths)}
     os.makedirs(f"experiments/{p['shared_parameters']['experiment_name'].split('_')[-1]}/exp_output/{args.experiment_name}/{args.algo_name}/results", exist_ok=True)
-    pickle.dump(results, open(f"experiments/{p['shared_parameters']['experiment_name'].split('_')[-1]}/exp_output/{args.experiment_name}/{args.algo_name}/results/{args.seed}_results.pkl", "wb"))
+    json.dump(results, open(f"experiments/atari/exp_output/{args.experiment_name}/{args.algo_name}/results/{args.seed}_results.json", "w"))
 
 
 def run(argvs=sys.argv[1:]):
