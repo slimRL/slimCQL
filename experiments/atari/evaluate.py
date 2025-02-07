@@ -33,15 +33,18 @@ def evaluate_one_iteration(
     p,
     args,
     idx_iteration,
-    eval_episode_returns_per_iteration,
-    eval_episode_lengths_per_iteration,
+    eval_episode_returns,
+    eval_episode_lengths,
 ):
+    
+    eval_episode_returns_per_iteration = []
+    eval_episode_lengths_per_iteration = []
+    eval_episode_returns_per_iteration[idx_iteration].append(0)
+    eval_episode_lengths_per_iteration[idx_iteration].append(0)
+    
     n_evaluation_steps_iteration = 0
     env.reset()
     has_reset = False
-
-    eval_episode_returns_per_iteration[idx_iteration].append(0)
-    eval_episode_lengths_per_iteration[idx_iteration].append(0)
 
     while n_evaluation_steps_iteration < args.n_evaluation_steps_per_iteration or not has_reset:
         key, action_key = jax.random.split(key)
@@ -68,6 +71,9 @@ def evaluate_one_iteration(
         if has_reset and n_evaluation_steps_iteration < args.n_evaluation_steps_per_iteration:
             eval_episode_returns_per_iteration[idx_iteration].append(0)
             eval_episode_lengths_per_iteration[idx_iteration].append(0)
+            
+    eval_episode_returns[idx_iteration] = eval_episode_returns_per_iteration
+    eval_episode_lengths[idx_iteration] = eval_episode_lengths_per_iteration
 
 
 def evaluate(key, q, p, args):
@@ -75,8 +81,8 @@ def evaluate(key, q, p, args):
 
     processes = []
     manager = multiprocess.Manager()
-    eval_episode_returns_per_iteration = manager.list([[] for _ in range(p[args.algo_name]["n_iterations"])])
-    eval_episode_lengths_per_iteration = manager.list([[] for _ in range(p[args.algo_name]["n_iterations"])])
+    eval_episode_returns = manager.list([np.nan for _ in range(p[args.algo_name]["n_iterations"])])
+    eval_episode_lengths = manager.list([np.nan for _ in range(p[args.algo_name]["n_iterations"])])
 
     for idx_iteration in range(p[args.algo_name]["n_iterations"]):
         processes.append(
@@ -95,8 +101,8 @@ def evaluate(key, q, p, args):
                     p,
                     args,
                     idx_iteration,
-                    eval_episode_returns_per_iteration,
-                    eval_episode_lengths_per_iteration,
+                    eval_episode_returns,
+                    eval_episode_lengths,
                 ),
             )
         )
@@ -105,7 +111,7 @@ def evaluate(key, q, p, args):
         process.start()
     for process in processes:
         process.join()
-    results = {"returns": eval_episode_returns_per_iteration, "episode_lengths": eval_episode_lengths_per_iteration}
+    results = {"returns": eval_episode_returns, "episode_lengths": eval_episode_lengths}
     os.makedirs(f"experiments/{p['shared_parameters']['experiment_name'].split('_')[-1]}/exp_output/{args.experiment_name}/{args.algo_name}/results", exist_ok=True)
     pickle.dump(results, open(f"experiments/{p['shared_parameters']['experiment_name'].split('_')[-1]}/exp_output/{args.experiment_name}/{args.algo_name}/results/{args.seed}_results.pkl", "wb"))
 
