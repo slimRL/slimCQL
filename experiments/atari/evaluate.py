@@ -31,6 +31,7 @@ def evaluate_one_iteration(
     agent_params,
     env,
     p,
+    args,
     idx_iteration,
     eval_episode_returns_per_iteration,
     eval_episode_lengths_per_iteration,
@@ -42,7 +43,7 @@ def evaluate_one_iteration(
     eval_episode_returns_per_iteration[idx_iteration].append(0)
     eval_episode_lengths_per_iteration[idx_iteration].append(0)
 
-    while n_evaluation_steps_iteration < p["n_evaluation_steps_per_iteration"] or not has_reset:
+    while n_evaluation_steps_iteration < args.n_evaluation_steps_per_iteration or not has_reset:
         key, action_key = jax.random.split(key)
         action = select_action(
             agent_best_action,
@@ -50,7 +51,7 @@ def evaluate_one_iteration(
             env.state,
             action_key,
             env.n_actions,
-            p["epsilon_eval"],
+            args.epsilon_eval,
         ).item()
         # print(f"Eval action = {action}")
 
@@ -60,17 +61,17 @@ def evaluate_one_iteration(
         eval_episode_returns_per_iteration[idx_iteration][-1] += reward
         eval_episode_lengths_per_iteration[idx_iteration][-1] += 1
 
-        has_reset = absorbing or env.n_steps >= p["max_steps_per_episode"]
+        has_reset = absorbing or env.n_steps >= args.max_steps_per_episode
         if has_reset:
             env.reset()
 
-        if has_reset and n_evaluation_steps_iteration < p["n_evaluation_steps_per_iteration"]:
+        if has_reset and n_evaluation_steps_iteration < args.n_evaluation_steps_per_iteration:
             eval_episode_returns_per_iteration[idx_iteration].append(0)
             eval_episode_lengths_per_iteration[idx_iteration].append(0)
 
 
 def evaluate(key, q, p, args):
-    all_keys = key.split(p[args.algo_name]["n_iterations"])
+    all_keys = jax.random.split(key, p[args.algo_name]["n_iterations"])
 
     processes = []
     manager = multiprocess.Manager()
@@ -86,12 +87,13 @@ def evaluate(key, q, p, args):
                     q.best_action,
                     pickle.load(
                         open(
-                            f"experiments/{p['shared_parameters']['experiment_name'].split('_')[-1]}/exp_output/{args.experiment_name}/{args.algo_name}/models/{args.seed}/{idx_iteration}",
+                            f"experiments/atari/exp_output/{args.experiment_name}/{args.algo_name}/models/{args.seed}/{idx_iteration}",
                             "rb",
                         )
-                    ),
+                    )["params"],
                     AtariEnv(p["shared_parameters"]["experiment_name"].split("_")[-1]),
                     p,
+                    args,
                     idx_iteration,
                     eval_episode_returns_per_iteration,
                     eval_episode_lengths_per_iteration,
@@ -104,17 +106,8 @@ def evaluate(key, q, p, args):
     for process in processes:
         process.join()
     results = {"returns": eval_episode_returns_per_iteration, "episode_lengths": eval_episode_lengths_per_iteration}
-    os.makedirs(
-        f"experiments/{p['shared_parameters']['experiment_name'].split('_')[-1]}/exp_output/{args.experiment_name}/{args.algo_name}/results",
-        exist_ok=True,
-    )
-    pickle.dump(
-        results,
-        open(
-            f"experiments/{p['shared_parameters']['experiment_name'].split('_')[-1]}/exp_output/{args.experiment_name}/{args.algo_name}/results/{args.seed}_results.pkl",
-            "wb",
-        ),
-    )
+    os.makedirs(f"experiments/{p['shared_parameters']['experiment_name'].split('_')[-1]}/exp_output/{args.experiment_name}/{args.algo_name}/results", exist_ok=True)
+    pickle.dump(results, open(f"experiments/{p['shared_parameters']['experiment_name'].split('_')[-1]}/exp_output/{args.experiment_name}/{args.algo_name}/results/{args.seed}_results.pkl", "wb"))
 
 
 def run(argvs=sys.argv[1:]):
@@ -180,21 +173,20 @@ def run(argvs=sys.argv[1:]):
     q_key, eval_key = jax.random.split(key)
 
     agent = DQN(
-        q_key=jax.random.PRNGKey(0),
+        key=jax.random.PRNGKey(0),
         observation_dim=(env.state_height, env.state_width, env.n_stacked_frames),
         n_actions=env.n_actions,
-        features=p["features"],
-        architecture_type=p["architecture_type"],
-        learning_rate=p["learning_rate"],
-        gamma=p["gamma"],
-        update_horizon=p["update_horizon"],
+        features=p["shared_parameters"]["features"],
+        architecture_type=p["shared_parameters"]["architecture_type"],
+        learning_rate=p["shared_parameters"]["learning_rate"],
+        gamma=p["shared_parameters"]["gamma"],
+        update_horizon=p["shared_parameters"]["update_horizon"],
         update_to_data=-1,
         target_update_frequency=-1,
         adam_eps=-1,
     )
 
     evaluate(eval_key, agent, p, args)
-
 
 if __name__ == "__main__":
     run()
