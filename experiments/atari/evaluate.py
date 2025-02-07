@@ -194,3 +194,7 @@ def run(argvs=sys.argv[1:]):
     )
 
     evaluate(eval_key, agent, p, args)
+
+
+if __name__ == "__main__":
+    run()
