@@ -172,14 +172,15 @@ def run(argvs=sys.argv[1:]):
     env_name = os.path.abspath(__file__).split("/")[-2]
     p_path = f"experiments/{env_name}/exp_output/{args.experiment_name}/parameters.json"
     p = json.load(open(p_path, "rb"))
+    multiprocess.set_start_method("spawn", force=True)
 
-    env = AtariEnv(p["shared_parameters"]["experiment_name"].split("_")[-1])
+    env = AtariEnv(p["shared_parameters"]["experiment_name"].split("_")[-1]) 
 
     key = jax.random.PRNGKey(args.seed)
     q_key, eval_key = jax.random.split(key)
 
     agent = DQN(
-        key=jax.random.PRNGKey(0),
+        key=q_key,
         observation_dim=(env.state_height, env.state_width, env.n_stacked_frames),
         n_actions=env.n_actions,
         features=p["shared_parameters"]["features"],
