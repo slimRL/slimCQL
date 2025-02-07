@@ -39,8 +39,8 @@ def evaluate_one_iteration(
     
     eval_episode_returns_per_iteration = []
     eval_episode_lengths_per_iteration = []
-    eval_episode_returns_per_iteration[idx_iteration].append(0)
-    eval_episode_lengths_per_iteration[idx_iteration].append(0)
+    eval_episode_returns_per_iteration.append(0)
+    eval_episode_lengths_per_iteration.append(0)
     
     n_evaluation_steps_iteration = 0
     env.reset()
@@ -61,16 +61,16 @@ def evaluate_one_iteration(
         reward, absorbing = env.step(action)
 
         n_evaluation_steps_iteration += 1
-        eval_episode_returns_per_iteration[idx_iteration][-1] += reward
-        eval_episode_lengths_per_iteration[idx_iteration][-1] += 1
+        eval_episode_returns_per_iteration[-1] += reward
+        eval_episode_lengths_per_iteration[-1] += 1
 
         has_reset = absorbing or env.n_steps >= args.max_steps_per_episode
         if has_reset:
             env.reset()
 
         if has_reset and n_evaluation_steps_iteration < args.n_evaluation_steps_per_iteration:
-            eval_episode_returns_per_iteration[idx_iteration].append(0)
-            eval_episode_lengths_per_iteration[idx_iteration].append(0)
+            eval_episode_returns_per_iteration.append(0)
+            eval_episode_lengths_per_iteration.append(0)
             
     eval_episode_returns[idx_iteration] = eval_episode_returns_per_iteration
     eval_episode_lengths[idx_iteration] = eval_episode_lengths_per_iteration
