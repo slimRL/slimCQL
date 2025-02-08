@@ -48,7 +48,7 @@ def run(argvs=sys.argv[1:]):
         update_horizon=p["update_horizon"],
         update_to_data=1,
         target_update_frequency=p["target_update_frequency"],
-        adam_eps=1.5e-4,
+        adam_eps=0.0003125,
         alpha_cql=p["alpha_cql"],
     )
     train_and_eval(train_key, p, agent, env, rb)
