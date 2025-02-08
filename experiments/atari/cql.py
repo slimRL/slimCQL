@@ -7,7 +7,7 @@ import numpy as np
 from experiments.base.fqi import train
 from experiments.base.utils import prepare_logs
 from slimfqi.environments.atari import AtariEnv
-from slimfqi.networks.dqn import DQN
+from slimfqi.networks.cql import CQL
 from slimfqi.sample_collection.fixed_replay_buffer import FixedReplayBuffer
 
 
@@ -18,7 +18,7 @@ def run(argvs=sys.argv[1:]):
     )
     p = prepare_logs(env_name, algo_name, argvs)
 
-    q_key, key = jax.random.split(jax.random.PRNGKey(p["seed"]))
+    q_key, train_key = jax.random.split(jax.random.PRNGKey(p["seed"]))
 
     env = AtariEnv(p["experiment_name"].split("_")[-1])
     rb = FixedReplayBuffer(
@@ -37,7 +37,7 @@ def run(argvs=sys.argv[1:]):
         compress=True,
         sampler_seed=p["seed"],
     )
-    agent = DQN(
+    agent = CQL(
         q_key,
         (env.state_height, env.state_width, env.n_stacked_frames),
         env.n_actions,
@@ -48,7 +48,8 @@ def run(argvs=sys.argv[1:]):
         update_horizon=p["update_horizon"],
         update_to_data=1,
         target_update_frequency=p["target_update_frequency"],
-        adam_eps=1.5e-4,
+        adam_eps=0.0003125,
+        alpha_cql=p["alpha_cql"],
     )
     train(p, agent, rb)
 

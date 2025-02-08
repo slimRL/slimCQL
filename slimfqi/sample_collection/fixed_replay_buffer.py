@@ -44,7 +44,7 @@ class FixedReplayBuffer(object):
         self._replay_indices = self._get_checkpoint_indices(replay_file_start_index, replay_file_end_index)
 
         if replay_checkpoint is not None:
-            self.load_single_buffer(replay_checkpoint)
+            self._replay_buffers = [self.load_single_buffer(replay_checkpoint)]
 
     def load_single_buffer(self, checkpoint):
         """Load a specific checkpoint"""
