@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from experiments.base.compute_iqm import get_iqm_and_conf
 
 env_name = "atari"
-experiment_folders = ["slimfqi_Pong/fqi"]
+experiment_folders = ["slimfqi_Pong/fqi", "slimcql_Pong/cql"]
 
 base_path = os.path.join(os.path.abspath(""), "experiments", env_name, "exp_output")
 
@@ -14,12 +14,12 @@ experiment_data = {experiment: {} for experiment in experiment_folders}
 
 for experiment in experiment_folders:
     experiment_path = os.path.join(base_path, experiment, "episode_returns_and_lengths")
+    print(experiment)
 
     returns_experiment_ = []
 
     for experiment_file in os.listdir(experiment_path):
-        list_episode_returns = json.load(open(os.path.join(experiment_path, experiment_file), "rb"))["returns"]
-
+        list_episode_returns = json.load(open(os.path.join(experiment_path, experiment_file), "rb"))["episode_returns"]
         returns_experiment_.append([np.mean(episode_returns) for episode_returns in list_episode_returns])
 
     returns_experiment = np.array(list(zip_longest(*returns_experiment_, fillvalue=np.nan))).T
@@ -33,13 +33,11 @@ for experiment in experiment_folders:
         seeds = np.array(list(map(lambda path: int(path.strip(".json")), os.listdir(experiment_path))))
         print(f"!!! Seeds {seeds[np.isnan(returns_experiment).any(axis=1)]} are not complete !!!")
 
-    experiment_data[experiment]["iqm"], experiment_data[experiment]["confidence"] = get_iqm_and_conf(
-        returns_experiment
-    )
+    experiment_data[experiment]["iqm"], experiment_data[experiment]["confidence"] = get_iqm_and_conf(returns_experiment)
     experiment_data[experiment]["x_values"] = (
-        np.arange(1, returns_experiment.shape[1] + 1) * p["fqi"]["n_fitting_steps"]
+        np.arange(1, returns_experiment.shape[1] + 1) * p[experiment.split("/")[-1]]["n_fitting_steps"]
     )
-    
+
 from experiments.atari import COLORS, ORDERS
 
 
@@ -72,5 +70,5 @@ ax.set_ylabel("IQM Return")
 
 ax.grid()
 ax.legend(ncols=1, frameon=False, loc="center", bbox_to_anchor=(1.25, 0.5))
-ax.set_title("Pong - FQI")
+ax.set_title("Pong")
 fig.savefig(f"experiments/{env_name}/exp_output/performances.pdf", bbox_inches="tight")

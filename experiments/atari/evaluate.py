@@ -12,6 +12,7 @@ import numpy as np
 import jax.numpy as jnp
 
 from slimfqi.networks.dqn import DQN
+from slimfqi.networks.cql import CQL
 from slimfqi.environments.atari import AtariEnv
 
 
@@ -36,12 +37,11 @@ def evaluate_one_iteration(
     eval_episode_returns,
     eval_episode_lengths,
 ):
-    
     eval_episode_returns_per_iteration = []
     eval_episode_lengths_per_iteration = []
     eval_episode_returns_per_iteration.append(0)
     eval_episode_lengths_per_iteration.append(0)
-    
+
     n_evaluation_steps_iteration = 0
     env.reset()
     has_reset = False
@@ -71,7 +71,7 @@ def evaluate_one_iteration(
         if has_reset and n_evaluation_steps_iteration < args.n_evaluation_steps_per_iteration:
             eval_episode_returns_per_iteration.append(0)
             eval_episode_lengths_per_iteration.append(0)
-            
+
     eval_episode_returns[idx_iteration] = eval_episode_returns_per_iteration
     eval_episode_lengths[idx_iteration] = eval_episode_lengths_per_iteration
 
@@ -84,7 +84,7 @@ def evaluate(key, q, p, args):
     eval_episode_returns = manager.list([np.nan for _ in range(p[args.algo_name]["n_iterations"])])
     eval_episode_lengths = manager.list([np.nan for _ in range(p[args.algo_name]["n_iterations"])])
 
-    for idx_iteration in range(p[args.algo_name]["n_iterations"]):
+    for idx_iteration in range(50):
         processes.append(
             multiprocess.Process(
                 target=evaluate_one_iteration,
@@ -111,9 +111,18 @@ def evaluate(key, q, p, args):
         process.start()
     for process in processes:
         process.join()
-    results = {"returns": list(eval_episode_returns), "episode_lengths": list(eval_episode_lengths)}
-    os.makedirs(f"experiments/{p['shared_parameters']['experiment_name'].split('_')[-1]}/exp_output/{args.experiment_name}/{args.algo_name}/results", exist_ok=True)
-    json.dump(results, open(f"experiments/atari/exp_output/{args.experiment_name}/{args.algo_name}/results/{args.seed}_results.json", "w"))
+    results = {"episode_returns": list(eval_episode_returns), "episode_lengths": list(eval_episode_lengths)}
+    os.makedirs(
+        f"experiments/atari/exp_output/{args.experiment_name}/{args.algo_name}/episode_returns_and_lengths",
+        exist_ok=True,
+    )
+    json.dump(
+        results,
+        open(
+            f"experiments/atari/exp_output/{args.experiment_name}/{args.algo_name}/episode_returns_and_lengths/{args.seed}_results.json",
+            "w",
+        ),
+    )
 
 
 def run(argvs=sys.argv[1:]):
@@ -174,26 +183,45 @@ def run(argvs=sys.argv[1:]):
     p = json.load(open(p_path, "rb"))
     multiprocess.set_start_method("spawn", force=True)
 
-    env = AtariEnv(p["shared_parameters"]["experiment_name"].split("_")[-1]) 
+    env = AtariEnv(p["shared_parameters"]["experiment_name"].split("_")[-1])
 
     key = jax.random.PRNGKey(args.seed)
     q_key, eval_key = jax.random.split(key)
 
-    agent = DQN(
-        key=q_key,
-        observation_dim=(env.state_height, env.state_width, env.n_stacked_frames),
-        n_actions=env.n_actions,
-        features=p["shared_parameters"]["features"],
-        architecture_type=p["shared_parameters"]["architecture_type"],
-        learning_rate=p["shared_parameters"]["learning_rate"],
-        gamma=p["shared_parameters"]["gamma"],
-        update_horizon=p["shared_parameters"]["update_horizon"],
-        update_to_data=-1,
-        target_update_frequency=-1,
-        adam_eps=-1,
-    )
+    if args.algo_name == "dqn":
+        agent = DQN(
+            key=q_key,
+            observation_dim=(env.state_height, env.state_width, env.n_stacked_frames),
+            n_actions=env.n_actions,
+            features=p["shared_parameters"]["features"],
+            architecture_type=p["shared_parameters"]["architecture_type"],
+            learning_rate=p["shared_parameters"]["learning_rate"],
+            gamma=p["shared_parameters"]["gamma"],
+            update_horizon=p["shared_parameters"]["update_horizon"],
+            update_to_data=-1,
+            target_update_frequency=-1,
+            adam_eps=-1,
+        )
+    elif args.algo_name == "cql":
+        agent = CQL(
+            key=q_key,
+            observation_dim=(env.state_height, env.state_width, env.n_stacked_frames),
+            n_actions=env.n_actions,
+            features=p["shared_parameters"]["features"],
+            architecture_type=p["shared_parameters"]["architecture_type"],
+            learning_rate=p["shared_parameters"]["learning_rate"],
+            gamma=p["shared_parameters"]["gamma"],
+            update_horizon=p["shared_parameters"]["update_horizon"],
+            update_to_data=-1,
+            target_update_frequency=-1,
+            adam_eps=-1,
+            alpha_cql=p["cql"]["alpha_cql"],
+        )
+    else:
+        assert False, f"Invalid algorithm {args.algo_name}"
 
     evaluate(eval_key, agent, p, args)
+
 
 if __name__ == "__main__":
     run()

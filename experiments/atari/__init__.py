@@ -26,6 +26,6 @@ AVAILABLE_COLORS = {
     "light_cyan": "#9EDAE5",
 }
 
-COLORS = {"fqi": AVAILABLE_COLORS["green"]}
+COLORS = {"fqi": AVAILABLE_COLORS["blue"], "cql": AVAILABLE_COLORS["green"]}
 
-ORDERS = {"fqi": 5}
+ORDERS = {"fqi": 5, "cql": 4}
