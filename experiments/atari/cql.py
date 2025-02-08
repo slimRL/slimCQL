@@ -4,7 +4,7 @@ import sys
 import jax
 import numpy as np
 
-from experiments.base.fqi import train_and_eval
+from experiments.base.fqi import train
 from experiments.base.utils import prepare_logs
 from slimfqi.environments.atari import AtariEnv
 from slimfqi.networks.cql import CQL
@@ -51,7 +51,7 @@ def run(argvs=sys.argv[1:]):
         adam_eps=0.0003125,
         alpha_cql=p["alpha_cql"],
     )
-    train_and_eval(train_key, p, agent, env, rb)
+    train(p, agent, rb)
 
 
 if __name__ == "__main__":
