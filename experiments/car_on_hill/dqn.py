@@ -24,7 +24,7 @@ def run(argvs=sys.argv[1:]):
 
     if p["data_dir"] is None:
         generate_replay_buffer(p, env)
-        p["data_dir"] = f"{p['save_path']}/../../../uniform_{p['replay_buffer_capacity']}"
+        p["data_dir"] = f"{p['save_path']}/../../../replay_buffer/uniform_{p['replay_buffer_capacity']}"
 
     rb = FixedReplayBuffer(
         data_dir=p["data_dir"],

@@ -62,7 +62,7 @@ def evaluate(p, env):
     if p["algo_name"] == "dqn":
         agent = DQN(
             key=jax.random.PRNGKey(0),
-            observation_dim=(env.state_height, env.state_width, env.n_stacked_frames),
+            observation_dim=env.observation_shape,
             n_actions=env.n_actions,
             features=p["features"],
             architecture_type=p["architecture_type"],
@@ -75,7 +75,7 @@ def evaluate(p, env):
     elif p["algo_name"] == "cql":
         agent = CQL(
             key=jax.random.PRNGKey(0),
-            observation_dim=(env.state_height, env.state_width, env.n_stacked_frames),
+            observation_dim=env.observation_shape,
             n_actions=env.n_actions,
             features=p["features"],
             architecture_type=p["architecture_type"],

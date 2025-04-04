@@ -50,5 +50,5 @@ class TestCarOnHill(unittest.TestCase):
         ).returncode
         assert returncode == 0, "The command should not have raised an error."
 
-        shutil.rmtree(os.path.join(save_path, "../../uniform_10"))
+        shutil.rmtree(os.path.join(save_path, "../../replay_buffer/uniform_10"))
         shutil.rmtree(save_path)

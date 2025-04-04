@@ -10,7 +10,7 @@ from slimdqn.environments.car_on_hill import CAR_ON_HILL_DEFAULT_HORIZON
 
 def generate_replay_buffer(p, env):
 
-    rb_path = os.path.join(f"{p['save_path']}/../../../uniform_{p['replay_buffer_capacity']}")
+    rb_path = os.path.join(f"{p['save_path']}/../../../replay_buffer/uniform_{p['replay_buffer_capacity']}")
     rb = ReplayBuffer(
         sampling_distribution=UniformSamplingDistribution(),
         batch_size=-1,
@@ -21,7 +21,7 @@ def generate_replay_buffer(p, env):
         compress=False,
     )
     if not os.path.exists(rb_path):
-        print("Replay buffer does not already exists. Creating one...")
+        print("Replay buffer does not exist. Creating one...")
 
         key = jax.random.PRNGKey(seed=0)
         n_positive_reward_samples = 0
@@ -31,7 +31,6 @@ def generate_replay_buffer(p, env):
         idx_observation = 0
 
         while rb.add_count < p["replay_buffer_capacity"]:
-            print(f"{rb.add_count}")
             observations.append(env.observation)
 
             key, sample_key = jax.random.split(key)

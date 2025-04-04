@@ -107,5 +107,6 @@ class FixedReplayBuffer:
             self._load_replay_buffers()
 
     def clear(self):
-        for replay_buffer in self._replay_buffers:
-            replay_buffer.clear()
+        if self.replay_checkpoint is None:
+            for replay_buffer in self._replay_buffers:
+                replay_buffer.clear()
