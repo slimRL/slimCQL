@@ -174,3 +174,4 @@ experiments/**/logs/*
 offline-dataset/*
 wandb/*
 **.zip
+**.gz
