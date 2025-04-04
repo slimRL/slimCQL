@@ -2,10 +2,10 @@ import os
 import sys
 
 import jax
-import numpy as np
 
 from experiments.base.dqn import train
 from experiments.base.utils import prepare_logs
+from experiments.car_on_hill.prepare_data import generate_replay_buffer
 from slimdqn.environments.car_on_hill import CarOnHill
 from slimdqn.networks.dqn import DQN
 from slimdqn.sample_collection.fixed_replay_buffer import FixedReplayBuffer
@@ -21,28 +21,33 @@ def run(argvs=sys.argv[1:]):
     q_key, key = jax.random.split(jax.random.PRNGKey(p["seed"]))
 
     env = CarOnHill()
+
+    if p["data_dir"] is None:
+        generate_replay_buffer(p, env)
+        p["data_dir"] = f"{p['save_path']}/../../../uniform_{p['replay_buffer_capacity']}"
+
     rb = FixedReplayBuffer(
-        data_dir=f"{p['data_dir']}/{p['seed']}",
-        n_buffers_to_load=p["n_buffers_to_load"],
+        data_dir=p["data_dir"],
+        n_buffers_to_load=1,
         replay_buffer_capacity=p["replay_buffer_capacity"],
         batch_size=p["batch_size"],
         update_horizon=p["update_horizon"],
         gamma=p["gamma"],
-        clipping=lambda x: np.clip(x, -1, 1),
-        stack_size=4,
-        compress=True,
+        clipping=None,
+        stack_size=1,
+        compress=False,
         sampler_seed=p["seed"],
+        replay_checkpoint=0,
     )
     agent = DQN(
         q_key,
-        (env.state_height, env.state_width, env.n_stacked_frames),
+        env.observation_shape,
         env.n_actions,
         features=p["features"],
         architecture_type=p["architecture_type"],
         learning_rate=p["learning_rate"],
         gamma=p["gamma"],
         update_horizon=p["update_horizon"],
-        update_to_data=1,
         target_update_frequency=p["target_update_frequency"],
         adam_eps=1.5e-4,
     )

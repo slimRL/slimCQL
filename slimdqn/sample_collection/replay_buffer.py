@@ -210,6 +210,7 @@ class ReplayBuffer:
             self.dataset_components["action"].append(replay_element_components[4])
             self.dataset_components["reward"].append(replay_element_components[5])
             self.dataset_components["is_terminal"].append(replay_element_components[6])
+            self.add_count += 1
 
     def sample(self, key, size=None) -> ReplayElement | tuple[ReplayElement]:
         """Sample a batch of elements from the replay buffer."""

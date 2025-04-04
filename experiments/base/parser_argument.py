@@ -52,7 +52,7 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         "--data_dir",
         help="Path to dataset.",
         type=str,
-        required=True,
+        default=None,
     )
     parser.add_argument(
         "-f",
@@ -103,7 +103,7 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         help="Type of architecture.",
         type=str,
         default="cnn",
-        choices=["cnn", "impala"],
+        choices=["cnn", "impala", "fc"],
     )
     parser.add_argument(
         "-tuf",

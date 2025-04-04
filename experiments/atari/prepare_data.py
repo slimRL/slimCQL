@@ -1,5 +1,8 @@
 import os
+import shutil
+import time
 import gzip
+from tqdm import tqdm
 import numpy as np
 
 from slimdqn.sample_collection.replay_buffer import TransitionElement, ReplayBuffer
@@ -8,11 +11,10 @@ from slimdqn.sample_collection.samplers import UniformSamplingDistribution
 STORE_FILENAME_PREFIX = "$store$_"
 ELEMS = ["observation", "action", "reward", "terminal"]
 
-GAME = input("Enter game name: ")
-seed = input("Enter seed: ")
-seed = int(seed)
-source_data_dir = input("Enter source data directory: ")
-destination_data_dir = input("Enter destination data directory: ")
+GAME = "Pong"
+seed = 1
+source_data_dir = "/home/yogesh/RL/dqn-dataset"
+destination_data_dir = "/home/yogesh/RL/offline-dataset"
 
 
 def transform_single_checkpoint(idx_checkpoint, data_dir):
@@ -25,20 +27,19 @@ def transform_single_checkpoint(idx_checkpoint, data_dir):
                 data[elem] = np.load(infile)
 
     rb = ReplayBuffer(
-        sampling_distribution=UniformSamplingDistribution(seed=0),
+        sampling_distribution=UniformSamplingDistribution(),
         batch_size=32,
         replay_buffer_capacity=1_000_000,
         stack_size=4,
         update_horizon=1,
         gamma=0.99,
-        checkpoint_duration=51,
         compress=True,
     )
 
-    for observation, action, reward, terminal in zip(
-        data["observation"], data["action"], data["reward"], data["terminal"]
+    for index, (_, action, reward, terminal) in enumerate(
+        zip(data["observation"], data["action"], data["reward"], data["terminal"])
     ):
-        rb.add(TransitionElement(observation, action, reward, terminal))
+        rb.add(TransitionElement(index, action, reward, terminal))
 
     return rb
 
@@ -46,11 +47,13 @@ def transform_single_checkpoint(idx_checkpoint, data_dir):
 data_dir = f"{source_data_dir}/{GAME}/{seed}/replay_logs"
 destination_dir = f"{destination_data_dir}/{GAME}/{seed}"
 os.makedirs(destination_dir)
-for idx_checkpoint in range(0, 50):
-    try:
-        rb = transform_single_checkpoint(idx_checkpoint, data_dir)
-        rb.save(checkpoint_dir=destination_dir, iteration_number=idx_checkpoint)
-        del rb
-        print(f"---------Finished seed = {seed}, ckpt = {idx_checkpoint}---------")
-    except Exception as e:
-        print(f"---------FAILED for seed = {seed}, ckpt = {idx_checkpoint}, error: {e}---------")
+for idx_iteration in tqdm(range(0, 50)):
+    os.makedirs(os.path.join(destination_dir, str(idx_iteration)))
+    shutil.copyfile(
+        f"{data_dir}/{STORE_FILENAME_PREFIX}observation_ckpt.{idx_iteration}.gz",
+        f"{destination_dir}/{idx_iteration}/observation.gz",
+    )
+    rb = transform_single_checkpoint(idx_iteration, data_dir)
+    rb.save(checkpoint_dir=destination_dir, idx_iteration=idx_iteration)
+    del rb
+    print(f"---------Game = {GAME}, Finished seed = {seed}, ckpt = {idx_iteration}---------")

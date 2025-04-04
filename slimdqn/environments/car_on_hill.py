@@ -31,32 +31,32 @@ class CarOnHill:
 
     @property
     def observation(self) -> np.ndarray:
-        return np.copy(self.state)
+        return np.copy(self.state_)
 
     @property
     def state(self) -> np.ndarray:
-        return np.copy(self.state)
+        return np.copy(self.state_)
 
     def reset(self, state=None, **kwargs):
         if state is None:
-            self.state = np.array([-0.5, 0])
+            self.state_ = np.array([-0.5, 0])
         else:
-            self.state = state
+            self.state_ = state
 
         self.n_steps = 0
 
     def step(self, action):
         self.n_steps += 1
         action = self._discrete_actions[action]
-        sa = np.append(self.state, action)
+        sa = np.append(self.state_, action)
         new_state = odeint(self._dpds, sa, [0, self._dt])
 
-        self.state = new_state[-1, :-1]
+        self.state_ = new_state[-1, :-1]
 
-        if self.state[0] < -self.max_pos or np.abs(self.state[1]) > self.max_velocity:
+        if self.state_[0] < -self.max_pos or np.abs(self.state_[1]) > self.max_velocity:
             reward = -1.0
             absorbing = True
-        elif self.state[0] > self.max_pos and np.abs(self.state[1]) <= self.max_velocity:
+        elif self.state_[0] > self.max_pos and np.abs(self.state_[1]) <= self.max_velocity:
             reward = 1.0
             absorbing = True
         else:

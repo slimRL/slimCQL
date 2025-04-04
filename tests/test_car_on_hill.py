@@ -27,7 +27,7 @@ class TestCarOnHill(unittest.TestCase):
                 "25",
                 "15",
                 "--replay_buffer_capacity",
-                "100",
+                "10",
                 "--batch_size",
                 "3",
                 "--update_horizon",
@@ -36,14 +36,19 @@ class TestCarOnHill(unittest.TestCase):
                 "0.99",
                 "--learning_rate",
                 "1e-4",
-                "--n_bellman_iterations",
+                "--architecture_type",
+                "fc",
+                "--target_update_frequency",
+                "1",
+                "--n_buffers_to_load",
+                "1",
+                "--n_epochs",
                 "1",
                 "--n_fitting_steps",
                 "10",
-                "--architecture_type",
-                "fc",
             ]
         ).returncode
         assert returncode == 0, "The command should not have raised an error."
 
-        # shutil.rmtree(save_path)
+        shutil.rmtree(os.path.join(save_path, "../../uniform_10"))
+        shutil.rmtree(save_path)

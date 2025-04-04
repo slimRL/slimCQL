@@ -42,7 +42,6 @@ def run(argvs=sys.argv[1:]):
         learning_rate=p["learning_rate"],
         gamma=p["gamma"],
         update_horizon=p["update_horizon"],
-        update_to_data=1,
         target_update_frequency=p["target_update_frequency"],
         adam_eps=1.5e-4,
     )
