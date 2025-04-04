@@ -3,7 +3,7 @@ from functools import partial
 import jax
 import jax.numpy as jnp
 
-from slimfqi.sample_collection.replay_buffer import ReplayElement
+from slimdqn.sample_collection.replay_buffer import ReplayElement
 
 
 class Generator:

@@ -1,4 +1,4 @@
-# slimRL - simple, minimal and flexible Deep RL
+# slimCQL - simple, minimal and flexible offline Deep RL
 
 ![python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)
 ![jax_badge][jax_badge_link]
@@ -6,7 +6,7 @@
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**`slimRL`** provides a concise and customizable implementation of Deep Q-Network (DQN) and Fitted Q Iteration (FQI) algorithms in Reinforcement Learning⛳ for Lunar Lander and Car-On-Hill environments. 
+**`slimCQL`** provides a concise and customizable implementation of Fitted Q Iteration (FQI) and Conservative Q-Learning (CQL) algorithms in Reinforcement Learning⛳ for Car-On-Hill and Atari environments. 
 It enables to quickly code and run proof-of-concept type of experiments in off-policy Deep RL settings.
 
 ### 🚀 Key advantages
@@ -14,10 +14,10 @@ It enables to quickly code and run proof-of-concept type of experiments in off-p
 ✅ Easy to experiment - flexible to play with algorithms and environments 📊\
 ✅ Fast to run - jax accleration, support for GPU and multiprocessing ⚡
 
-<p align="center">
+<!-- <p align="center">
   <img width=48% src="images/lunar_lander.gif">
   <img width=48% src="images/car_on_hill.gif">
-</p>
+</p> -->
 
 
 Let's dive in!

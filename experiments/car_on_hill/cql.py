@@ -6,7 +6,7 @@ import numpy as np
 
 from experiments.base.dqn import train
 from experiments.base.utils import prepare_logs
-from slimdqn.environments.atari import AtariEnv
+from slimdqn.environments.car_on_hill import CarOnHill
 from slimdqn.networks.cql import CQL
 from slimdqn.sample_collection.fixed_replay_buffer import FixedReplayBuffer
 
@@ -15,7 +15,7 @@ def run(argvs=sys.argv[1:]):
     env_name, algo_name = (os.path.abspath(__file__).split("/")[-2], os.path.abspath(__file__).split("/")[-1][:-3])
     p = prepare_logs(env_name, algo_name, argvs)
 
-    env = AtariEnv(p["experiment_name"].split("_")[-1])
+    env = CarOnHill()
     rb = FixedReplayBuffer(
         data_dir=f"{p['data_dir']}/{p['seed']}",
         n_buffers_to_load=p["n_buffers_to_load"],

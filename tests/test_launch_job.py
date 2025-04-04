@@ -2,21 +2,17 @@ import subprocess
 
 
 def test_launch_local():
-    returncode = subprocess.run(["launch_job/car_on_hill/local_fqi.sh"]).returncode
+    returncode = subprocess.run(["launch_job/car_on_hill/local_dqn.sh"]).returncode
     assert returncode > 0, "The command should have raised an error telling that the experiment name is not specified."
 
     returncode = subprocess.run(
-        [
-            "launch_job/car_on_hill/local_fqi.sh",
-            "--experiment_name",
-            "_test_launch_local",
-        ]
+        ["launch_job/car_on_hill/local_dqn.sh", "--experiment_name", "_test_launch_local"]
     ).returncode
     assert returncode > 0, "The command should have raised an error telling that the first seed is not specified."
 
     returncode = subprocess.run(
         [
-            "launch_job/car_on_hill/local_fqi.sh",
+            "launch_job/car_on_hill/local_dqn.sh",
             "--experiment_name",
             "_test_launch_local",
             "--first_seed",
@@ -27,7 +23,7 @@ def test_launch_local():
 
     returncode = subprocess.run(
         [
-            "launch_job/car_on_hill/local_fqi.sh",
+            "launch_job/car_on_hill/local_dqn.sh",
             "--experiment_name",
             "_test_launch_local",
             "--first_seed",

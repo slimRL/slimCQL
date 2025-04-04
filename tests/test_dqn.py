@@ -3,7 +3,7 @@ import numpy as np
 import jax
 import jax.numpy as jnp
 
-from slimfqi.networks.dqn import DQN
+from slimdqn.networks.dqn import DQN
 from tests.utils import Generator
 
 
@@ -13,31 +13,25 @@ class TestDQN(unittest.TestCase):
         self.random_seed = np.random.randint(1000)
         self.key = jax.random.PRNGKey(self.random_seed)
 
-        (
-            key_actions,
-            key_feature_1,
-            key_feature_2,
-            key_feature_3,
-            key_feature_4,
-        ) = jax.random.split(self.key, 5)
+        key_actions, key_feature_1, key_feature_2, key_feature_3, key_feature_4 = jax.random.split(self.key, 5)
         self.observation_dim = (84, 84, 4)
         self.n_actions = int(jax.random.randint(key_actions, (), minval=2, maxval=10))
         self.q = DQN(
-            key=self.key,
-            observation_dim=self.observation_dim,
-            n_actions=self.n_actions,
-            features=[
+            self.key,
+            self.observation_dim,
+            self.n_actions,
+            [
                 jax.random.randint(key_feature_1, (), minval=1, maxval=10),
                 jax.random.randint(key_feature_2, (), minval=1, maxval=10),
                 jax.random.randint(key_feature_3, (), minval=1, maxval=10),
                 jax.random.randint(key_feature_4, (), minval=1, maxval=10),
             ],
-            architecture_type="impala",
-            learning_rate=0.001,
-            gamma=0.94,
-            update_horizon=1,
-            update_to_data=1,
-            target_update_frequency=1,
+            "impala",
+            0.001,
+            0.94,
+            1,
+            1,
+            1,
         )
 
         self.generator = Generator(None, self.observation_dim, self.n_actions)

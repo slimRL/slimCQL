@@ -3,15 +3,16 @@
 
 from absl.testing import absltest
 from absl.testing import parameterized
-from slimfqi.sample_collection import samplers
+from slimdqn.sample_collection import samplers
 import numpy as np
+import jax
 
 
 class SamplersTest(parameterized.TestCase):
     def setUp(self):
         super().setUp()
-        self.uniform_sampler = samplers.UniformSamplingDistribution(seed=0)
-        self.prioritized_sampler = samplers.PrioritizedSamplingDistribution(seed=0, replay_buffer_capacity=10)
+        self.uniform_sampler = samplers.UniformSamplingDistribution()
+        self.prioritized_sampler = samplers.PrioritizedSamplingDistribution(replay_buffer_capacity=10)
 
     def test_prioritized_sample(self):
         keys = [0, 1, 2, 3, 4]
@@ -21,30 +22,18 @@ class SamplersTest(parameterized.TestCase):
             self.prioritized_sampler.add(key, priority=priority)
 
         # test if zero priority absent
-        samples = self.prioritized_sampler.sample(5)
+        samples = self.prioritized_sampler.sample(5, jax.random.PRNGKey(0))
         np.testing.assert_array_less(samples, 4)
 
         self.prioritized_sampler.update(keys=np.array([2, 3]), priorities=np.array([0.0, 0.0]))
 
         # test if priority updated properly
-        samples = self.prioritized_sampler.sample(5)
+        samples = self.prioritized_sampler.sample(5, jax.random.PRNGKey(0))
         np.testing.assert_array_less(samples, 2)
 
         self.prioritized_sampler.remove(0)
-        samples = self.prioritized_sampler.sample(5)
+        samples = self.prioritized_sampler.sample(5, jax.random.PRNGKey(0))
         np.testing.assert_array_almost_equal(samples, 1)
-
-    def test_serializes(self):
-        sampler = samplers.UniformSamplingDistribution(0)
-        sampler.add(1)
-        state_dict = sampler.to_state_dict()
-        self.assertIn("key_to_index", state_dict)
-        self.assertIn("index_to_key", state_dict)
-        self.assertIn("rng_state", state_dict)
-
-        sampler = samplers.UniformSamplingDistribution(0)
-        sampler.from_state_dict(state_dict)
-        self.assertEqual(sampler.sample(1), 1)
 
     def test_clear_uniform_sampler(self):
         self.uniform_sampler.add(1)

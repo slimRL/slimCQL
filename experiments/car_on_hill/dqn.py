@@ -6,16 +6,21 @@ import numpy as np
 
 from experiments.base.dqn import train
 from experiments.base.utils import prepare_logs
-from slimdqn.environments.atari import AtariEnv
-from slimdqn.networks.cql import CQL
+from slimdqn.environments.car_on_hill import CarOnHill
+from slimdqn.networks.dqn import DQN
 from slimdqn.sample_collection.fixed_replay_buffer import FixedReplayBuffer
 
 
 def run(argvs=sys.argv[1:]):
-    env_name, algo_name = (os.path.abspath(__file__).split("/")[-2], os.path.abspath(__file__).split("/")[-1][:-3])
+    env_name, algo_name = (
+        os.path.abspath(__file__).split("/")[-2],
+        os.path.abspath(__file__).split("/")[-1][:-3],
+    )
     p = prepare_logs(env_name, algo_name, argvs)
 
-    env = AtariEnv(p["experiment_name"].split("_")[-1])
+    q_key, key = jax.random.split(jax.random.PRNGKey(p["seed"]))
+
+    env = CarOnHill()
     rb = FixedReplayBuffer(
         data_dir=f"{p['data_dir']}/{p['seed']}",
         n_buffers_to_load=p["n_buffers_to_load"],
@@ -28,8 +33,8 @@ def run(argvs=sys.argv[1:]):
         compress=True,
         sampler_seed=p["seed"],
     )
-    agent = CQL(
-        jax.random.PRNGKey(p["seed"]),
+    agent = DQN(
+        q_key,
         (env.state_height, env.state_width, env.n_stacked_frames),
         env.n_actions,
         features=p["features"],
@@ -37,9 +42,9 @@ def run(argvs=sys.argv[1:]):
         learning_rate=p["learning_rate"],
         gamma=p["gamma"],
         update_horizon=p["update_horizon"],
+        update_to_data=1,
         target_update_frequency=p["target_update_frequency"],
-        adam_eps=0.0003125,
-        alpha_cql=p["alpha_cql"],
+        adam_eps=1.5e-4,
     )
     train(p, agent, rb)
 

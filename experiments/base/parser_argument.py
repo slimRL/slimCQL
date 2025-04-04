@@ -48,19 +48,26 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         action="store_true",
     )
     parser.add_argument(
+        "-dd",
+        "--data_dir",
+        help="Path to dataset.",
+        type=str,
+        required=True,
+    )
+    parser.add_argument(
         "-f",
         "--features",
         nargs="*",
         help="List of features for the Q-networks.",
         type=int,
-        default=[200, 200],
+        default=[32, 64, 64, 512],
     )
     parser.add_argument(
         "-rbc",
         "--replay_buffer_capacity",
         help="Dataset (Fixed replay) size.",
         type=int,
-        default=10_000,
+        default=50_000,  # 5% of entire replay buffer for single checkpoint
     )
     parser.add_argument(
         "-bs",
@@ -88,15 +95,15 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         "--learning_rate",
         help="Learning rate.",
         type=float,
-        default=3e-4,
+        default=5e-5,
     )
     parser.add_argument(
         "-at",
         "--architecture_type",
         help="Type of architecture.",
         type=str,
-        default="fc",
-        choices=["cnn", "impala", "fc"],
+        default="cnn",
+        choices=["cnn", "impala"],
     )
     parser.add_argument(
         "-tuf",
@@ -106,84 +113,39 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         default=2000,
     )
     parser.add_argument(
-        "-dd",
-        "--data_dir",
-        help="Path to dataset.",
-        type=str,
-        required=True,
-    )
-    parser.add_argument(
         "-nbtl",
         "--n_buffers_to_load",
-        help="Number of buffers to load.",
+        help="Number of buffers to load in parallel.",
         type=int,
-        required=True,
+        default=5,
     )
     parser.add_argument(
-        "-rc",
-        "--replay_checkpoint",
-        help="Specific checkpoint to load (keep n_buffers_to_load=1).",
+        "-ne",
+        "--n_epochs",
+        help="Number of epochs to perform.",
         type=int,
-        default=None,
+        default=50,
     )
     parser.add_argument(
-        "-rfsi",
-        "--replay_file_start_index",
-        help="Replay file start index.",
+        "-nfs",
+        "--n_fitting_steps",
+        help="Number of gradient update steps per epoch.",
         type=int,
-        default=0,
-    )
-    parser.add_argument(
-        "-rfei",
-        "--replay_file_end_index",
-        help="Replay file end index.",
-        type=int,
-        default=None,
-    )
-    parser.add_argument(
-        "-rtsi",
-        "--replay_transitions_start_index",
-        help="Replay transitions start index.",
-        type=int,
-        default=0,
+        default=62_500,
     )
 
 
 @output_added_arguments
-def add_fqi_arguments(parser: argparse.ArgumentParser):
-    parser.add_argument(
-        "-ni",
-        "--n_iterations",
-        help="Number of Bellman iterations to perform.",
-        type=int,
-        default=30,
-    )
-
-    parser.add_argument(
-        "-nfs",
-        "--n_fitting_steps",
-        help="Number of gradient update steps per Bellman iteration.",
-        type=int,
-        default=5,
-    )
+def add_dqn_arguments(parser: argparse.ArgumentParser):
+    pass
 
 
 @output_added_arguments
 def add_cql_arguments(parser: argparse.ArgumentParser):
-    parser.add_argument("-acql", "--alpha_cql", help="Weighting parameter of CQL.", type=float, default=0.1)
-
     parser.add_argument(
-        "-ni",
-        "--n_iterations",
-        help="Number of Bellman iterations to perform.",
-        type=int,
-        default=30,
-    )
-
-    parser.add_argument(
-        "-nfs",
-        "--n_fitting_steps",
-        help="Number of gradient update steps per Bellman iteration.",
-        type=int,
-        default=5,
+        "-acql",
+        "--alpha_cql",
+        help="Weighting parameter of CQL.",
+        type=float,
+        default=0.1,
     )

@@ -2,8 +2,8 @@ import os
 import gzip
 import numpy as np
 
-from slimfqi.sample_collection.replay_buffer import TransitionElement, ReplayBuffer
-from slimfqi.sample_collection.samplers import UniformSamplingDistribution
+from slimdqn.sample_collection.replay_buffer import TransitionElement, ReplayBuffer
+from slimdqn.sample_collection.samplers import UniformSamplingDistribution
 
 STORE_FILENAME_PREFIX = "$store$_"
 ELEMS = ["observation", "action", "reward", "terminal"]

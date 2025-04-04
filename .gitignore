@@ -171,3 +171,6 @@ rough/
 !experiments/car_on_hill/V*.npy
 experiments/**/exp_output/*
 experiments/**/logs/*
+offline-dataset/*
+wandb/*
+**.zip

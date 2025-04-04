@@ -6,7 +6,7 @@ import argparse
 
 from experiments.base.eval_parser_argument import add_eval_arguments
 from experiments.base.evaluate import evaluate
-from slimdqn.environments.atari import AtariEnv
+from slimdqn.environments.car_on_hill import CarOnHill
 
 
 def run(argvs=sys.argv[1:]):
@@ -21,7 +21,7 @@ def run(argvs=sys.argv[1:]):
         os.path.dirname(os.path.abspath(__file__)),
         f"../{env_name}/exp_output/{p['experiment_name']}/{p['algo_name']}",
     )
-    env = AtariEnv(p["experiment_name"].split("_")[-1])
+    env = CarOnHill()
 
     evaluate(p, env)
 
