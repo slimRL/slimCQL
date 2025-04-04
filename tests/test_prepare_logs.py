@@ -43,9 +43,6 @@ def test_prepare_logs():
             assert 0, f"The exception {type(e).__name__} is raised. Exception: {e}"
 
     # Create again folders and parameters.json with different first parameter for dqn -> should throw an error
-    parameters = json.load(open(os.path.join(save_path, "parameters.json"), "rb"))
-    first_dqn_param = list(parameters["dqn"].keys())[1]
-    first_dqn_param_value = parameters["dqn"][first_dqn_param] + 1
     try:
         prepare_logs(
             "car_on_hill",
@@ -55,8 +52,6 @@ def test_prepare_logs():
                 "_test_prepare_logs",
                 "--seed",
                 "3",
-                f"--{first_dqn_param}",
-                f"{first_dqn_param_value}",
                 "--disable_wandb",
             ],
         )

@@ -268,6 +268,7 @@ class ReplayBuffer:
 
     def _load_transitions(self, replay_transitions_start_index=None):
 
+        self.add_count = 0
         replay_transitions_end_index = len(self.dataset_components["action"])
         if replay_transitions_start_index is not None:
             replay_transitions_end_index = min(
