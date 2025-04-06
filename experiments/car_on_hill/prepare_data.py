@@ -38,7 +38,7 @@ def generate_replay_buffer(p, env):
             reward, absorbing = env.step(action)
 
             episode_end = absorbing or env.n_steps >= CAR_ON_HILL_DEFAULT_HORIZON
-            rb.add(TransitionElement(idx_observation, action, reward, episode_end))
+            rb.add(TransitionElement(idx_observation, action, reward, absorbing, episode_end))
 
             idx_observation += 1
             n_positive_reward_samples += reward > 0
