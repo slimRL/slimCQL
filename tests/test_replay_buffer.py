@@ -161,8 +161,7 @@ class ReplayBufferTest(parameterized.TestCase):
             rb.add(TransitionElement(i, 0, 0, terminal, False))
             rb.dataset_components["observation"].append(np.full(OBSERVATION_SHAPE, i))
 
-            if not terminal:
-                index_to_id.append(i)
+            index_to_id.append(i)
 
         rb._load_transitions()
         # Verify we sample the expected indices by using the same rng state.
@@ -174,7 +173,7 @@ class ReplayBufferTest(parameterized.TestCase):
 
         # Replicating the formula used above to determine what transitions are terminal
         expected_terminal = np.array(
-            [int(((index_to_id[rb._sampling_distribution._index_to_key[i]] + 1) % 4) == 0) for i in indices]
+            [int(((index_to_id[rb._sampling_distribution._index_to_key[i]]) % 4) == 0) for i in indices]
         )
         batch = rb.sample(key, size=len(indices))
         np.testing.assert_array_equal(batch.action, np.zeros(len(indices)))
@@ -212,13 +211,8 @@ class ReplayBufferTest(parameterized.TestCase):
         batch = rb.sample(key, size=5)
 
         # Since index 3 is terminal, it will not be a valid transition so renumber.
-        expected_states = np.array(
-            [
-                np.full(OBSERVATION_SHAPE + (1,), i) if i < 3 else np.full(OBSERVATION_SHAPE + (1,), i + 1)
-                for i in indices
-            ]
-        )
-        expected_actions = np.array([i * 2 if i < 3 else (i + 1) * 2 for i in indices])
+        expected_states = np.array([np.full(OBSERVATION_SHAPE + (1,), i) for i in indices])
+        expected_actions = np.array([i * 2 for i in indices])
         # The reward in the replay buffer will be (an asterisk marks the terminal
         # state):
         #   [0 1 2 3* 4 5 6 7 8 9]
@@ -226,9 +220,9 @@ class ReplayBufferTest(parameterized.TestCase):
         # reward starting at each of the replay buffer positions will be (a '_'
         # marks an invalid transition to sample):
         #   [3 6 5 _ 15 18 21 24]
-        expected_rewards = np.array([3, 6, 5, 15, 18, 21, 24])
+        expected_rewards = np.array([3, 6, 5, 3, 15, 18, 21, 24])
         # Because update_horizon = 3, indices 0, 1 and 2 include terminal.
-        expected_terminals = np.array([1, 1, 1, 0, 0, 0, 0])
+        expected_terminals = np.array([0, 1, 1, 1, 0, 0, 0, 0])
         np.testing.assert_array_equal(batch.state, expected_states)
         np.testing.assert_array_equal(batch.action, expected_actions)
         np.testing.assert_array_equal(batch.reward, expected_rewards[indices])
