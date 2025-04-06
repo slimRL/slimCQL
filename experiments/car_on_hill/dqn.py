@@ -18,8 +18,6 @@ def run(argvs=sys.argv[1:]):
     )
     p = prepare_logs(env_name, algo_name, argvs)
 
-    q_key, key = jax.random.split(jax.random.PRNGKey(p["seed"]))
-
     env = CarOnHill()
 
     if p["data_dir"] is None:
@@ -40,7 +38,7 @@ def run(argvs=sys.argv[1:]):
         replay_checkpoint=0,
     )
     agent = DQN(
-        q_key,
+        jax.random.PRNGKey(p["seed"]),
         env.observation_shape,
         env.n_actions,
         features=p["features"],
