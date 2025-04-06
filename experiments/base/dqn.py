@@ -33,4 +33,4 @@ def train(
 
         fixed_rb.clear()
         save_model(p, agent.get_model(), idx_epoch + 1)
-        print(f"--- Epoch {idx_epoch + 1} completed in {round((time.time() - time_epoch)/60, 4)} mins ---")
+        print(f"--- Epoch {idx_epoch + 1} completed in {round((time.time() - time_epoch)/60, 4)} mins ---", flush=True)
