@@ -60,7 +60,7 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         nargs="*",
         help="List of features for the Q-networks.",
         type=int,
-        default=[32, 64, 64, 512],
+        default=[40, 20],
     )
     parser.add_argument(
         "-rbc",
@@ -74,7 +74,7 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         "--batch_size",
         help="Batch size for training.",
         type=int,
-        default=32,
+        default=100,
     )
     parser.add_argument(
         "-n",
@@ -88,21 +88,21 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         "--gamma",
         help="Discounting factor.",
         type=float,
-        default=0.99,
+        default=0.95,
     )
     parser.add_argument(
         "-lr",
         "--learning_rate",
         help="Learning rate.",
         type=float,
-        default=5e-5,
+        default=3e-3,
     )
     parser.add_argument(
         "-at",
         "--architecture_type",
         help="Type of architecture.",
         type=str,
-        default="cnn",
+        default="fc",
         choices=["cnn", "impala", "fc"],
     )
     parser.add_argument(
@@ -110,28 +110,28 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         "--target_update_frequency",
         help="Number of training steps before updating the target Q-network.",
         type=int,
-        default=2000,
+        default=250,
     )
     parser.add_argument(
         "-nbtl",
         "--n_buffers_to_load",
         help="Number of buffers to load in parallel.",
         type=int,
-        default=5,
+        default=1,
     )
     parser.add_argument(
         "-ne",
         "--n_epochs",
         help="Number of epochs to perform.",
         type=int,
-        default=50,
+        default=30,
     )
     parser.add_argument(
         "-nfs",
         "--n_fitting_steps",
         help="Number of gradient update steps per epoch.",
         type=int,
-        default=62_500,
+        default=500,
     )
 
 
