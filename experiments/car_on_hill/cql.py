@@ -2,7 +2,6 @@ import os
 import sys
 
 import jax
-import numpy as np
 
 from experiments.base.dqn import train
 from experiments.base.utils import prepare_logs
