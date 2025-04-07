@@ -30,7 +30,7 @@ def run(argvs=sys.argv[1:]):
     )
     agent = CQL(
         jax.random.PRNGKey(p["seed"]),
-        (env.state_height, env.state_width, env.n_stacked_frames),
+        env.observation_shape,
         env.n_actions,
         features=p["features"],
         architecture_type=p["architecture_type"],

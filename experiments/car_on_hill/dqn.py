@@ -12,10 +12,7 @@ from slimdqn.sample_collection.fixed_replay_buffer import FixedReplayBuffer
 
 
 def run(argvs=sys.argv[1:]):
-    env_name, algo_name = (
-        os.path.abspath(__file__).split("/")[-2],
-        os.path.abspath(__file__).split("/")[-1][:-3],
-    )
+    env_name, algo_name = (os.path.abspath(__file__).split("/")[-2], os.path.abspath(__file__).split("/")[-1][:-3])
     p = prepare_logs(env_name, algo_name, argvs)
 
     env = CarOnHill()
