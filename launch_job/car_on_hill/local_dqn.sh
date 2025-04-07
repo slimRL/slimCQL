@@ -9,9 +9,7 @@ if ! tmux has-session -t cql; then
 fi
 
 tmux send-keys -t cql "cd $(pwd)" ENTER
-tmux send-keys -t cql "source env/bin/activate" ENTER
-FRACTION_GPU=$(echo "scale=2 ; 0.98 / ($LAST_SEED - $FIRST_SEED + 1)" | bc)
-tmux send-keys -t cql "export XLA_PYTHON_CLIENT_MEM_FRACTION=$FRACTION_GPU" ENTER
+tmux send-keys -t cql "source env_cpu/bin/activate" ENTER
 
 echo "launch train $ALGO_NAME local"
 for (( seed=$FIRST_SEED; seed<=$LAST_SEED; seed++ ))
@@ -23,10 +21,6 @@ tmux send-keys -t cql "wait" ENTER
 
 N_PARALLEL_EPOCHS=10
 N_EPOCHS=$(echo "$ARGS" | grep -oP '(?<=--n_epochs |-ne )\d+')
-echo "$N_PARALLEL_EPOCHS, $N_EPOCHS"
-
-FRACTION_GPU=$(echo "scale=2 ; 0.98 / $N_PARALLEL_EPOCHS" | bc)
-tmux send-keys -t cql "export XLA_PYTHON_CLIENT_MEM_FRACTION=$FRACTION_GPU" ENTER
 
 for (( seed=$FIRST_SEED; seed<=$LAST_SEED; seed++ ))
 do
