@@ -35,14 +35,14 @@ def add_eval_arguments(parser: argparse.ArgumentParser):
         "--horizon",
         help="Horizon for truncation.",
         type=int,
-        default=27_000,
+        default=100,
     )
     parser.add_argument(
         "-nespi",
         "--n_evaluation_steps_per_epoch",
         help="Evaluation steps per epoch.",
         type=int,
-        default=125_000,
+        default=1_000,
     )
     parser.add_argument(
         "-ee",
