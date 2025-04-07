@@ -1,7 +1,6 @@
 import argparse
 
-
-def add_eval_arguments(parser: argparse.ArgumentParser):
+def add_base_arguments(parser: argparse.ArgumentParser):
     parser.add_argument(
         "-en",
         "--experiment_name",
@@ -23,6 +22,10 @@ def add_eval_arguments(parser: argparse.ArgumentParser):
         type=int,
         required=True,
     )
+    
+    
+def add_eval_arguments(parser: argparse.ArgumentParser):
+    add_base_arguments(parser)
     parser.add_argument(
         "-e",
         "--epoch",
@@ -51,6 +54,16 @@ def add_eval_arguments(parser: argparse.ArgumentParser):
         type=float,
         default=0.001,
     )
+    
+def add_synchronization_arguments(parser: argparse.ArgumentParser):
+    add_base_arguments(parser)
+    parser.add_argument(
+        "-env",
+        "--env_name",
+        help="Environment name.",
+        type=str,
+        required=True,
+    )
     parser.add_argument(
         "-dm",
         "--delete_models",
@@ -58,3 +71,4 @@ def add_eval_arguments(parser: argparse.ArgumentParser):
         default=False,
         action="store_true",
     )
+    
