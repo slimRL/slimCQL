@@ -161,14 +161,11 @@ cython_debug/
 .venv/
 env/
 env_cpu/
-env_gpu/
-env_test/
+env/
 rough/
 
 **.json
 **.npy
-!experiments/car_on_hill/Q*.npy
-!experiments/car_on_hill/V*.npy
 experiments/**/exp_output/*
 experiments/**/logs/*
 offline-dataset/*
