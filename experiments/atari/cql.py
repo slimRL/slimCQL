@@ -7,7 +7,7 @@ import numpy as np
 from experiments.base.dqn import train
 from experiments.base.utils import prepare_logs
 from slimdqn.environments.atari import AtariEnv
-from slimdqn.networks.cql import CQL
+from slimdqn.algorithms.cql import CQL
 from slimdqn.sample_collection.fixed_replay_buffer import FixedReplayBuffer
 
 

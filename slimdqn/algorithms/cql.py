@@ -2,16 +2,15 @@ from functools import partial
 
 import jax
 import jax.numpy as jnp
-import numpy as np
 import optax
 from flax.core import FrozenDict
 
-from slimdqn.networks.architectures.dqn import DQNNet
+from slimdqn.algorithms.architectures.dqn import DQNNet
 from slimdqn.sample_collection.fixed_replay_buffer import FixedReplayBuffer
 from slimdqn.sample_collection.replay_buffer import ReplayElement
 
 
-class DQN:
+class CQL:
     def __init__(
         self,
         key: jax.random.PRNGKey,
@@ -23,7 +22,8 @@ class DQN:
         gamma: float,
         update_horizon: int,
         target_update_frequency: int,
-        adam_eps: float = 1e-8,
+        alpha_cql: float,
+        adam_eps: float = 0.0003125,
     ):
         self.network = DQNNet(features, architecture_type, n_actions)
         self.params = self.network.init(key, jnp.zeros(observation_dim, dtype=jnp.float32))
@@ -36,6 +36,7 @@ class DQN:
         self.update_horizon = update_horizon
         self.target_update_frequency = target_update_frequency
         self.cumulated_loss = 0
+        self.alpha_cql = alpha_cql
 
     @partial(jax.jit, static_argnames="self")
     def apply_multiple_updates(self, params, params_target, optimizer_state, batches):
@@ -58,7 +59,7 @@ class DQN:
         )
         self.cumulated_loss += loss
 
-    def update_target_params(self, **kwargs):
+    def update_target_params(self):
         self.target_params = self.params.copy()
 
         logs = {"loss": self.cumulated_loss / self.target_update_frequency}
@@ -77,10 +78,12 @@ class DQN:
         return jax.vmap(self.loss, in_axes=(None, None, 0))(params, params_target, samples).mean()
 
     def loss(self, params: FrozenDict, params_target: FrozenDict, sample: ReplayElement):
-        # computes the loss for a single sample
+        q_values = self.network.apply(params, sample.state)
         target = self.compute_target(params_target, sample)
-        q_value = self.network.apply(params, sample.state)[sample.action]
-        return jnp.square(q_value - target)
+
+        return jnp.square(target - q_values[sample.action]) + self.alpha_cql * (
+            jax.scipy.special.logsumexp(q_values, axis=-1) - q_values[sample.action]
+        )
 
     def compute_target(self, params: FrozenDict, sample: ReplayElement):
         # computes the target value for single sample
@@ -88,9 +91,9 @@ class DQN:
             self.network.apply(params, sample.next_state)
         )
 
-    def best_action(self, params: FrozenDict, state: jnp.ndarray):
+    def best_action(self, params: FrozenDict, state: jnp.ndarray, **kwargs):
         # computes the best action for a single state
-        return jnp.argmax(self.network.apply(params, state))
+        return jnp.argmax(self.network.apply(params, state)).astype(jnp.int8)
 
     def get_model(self):
         return {"params": self.params}

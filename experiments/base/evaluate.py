@@ -6,8 +6,8 @@ from functools import partial
 import jax
 import jax.numpy as jnp
 
-from slimdqn.networks.dqn import DQN
-from slimdqn.networks.cql import CQL
+from slimdqn.algorithms.dqn import DQN
+from slimdqn.algorithms.cql import CQL
 
 
 @partial(jax.jit, static_argnames=("best_action_fn", "n_actions", "epsilon_eval"))

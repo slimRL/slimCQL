@@ -3,7 +3,7 @@ import numpy as np
 import jax
 import jax.numpy as jnp
 
-from slimdqn.networks.cql import CQL
+from slimdqn.algorithms.cql import CQL
 from tests.utils import Generator
 
 
