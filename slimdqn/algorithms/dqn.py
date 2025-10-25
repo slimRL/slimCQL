@@ -2,7 +2,6 @@ from functools import partial
 
 import jax
 import jax.numpy as jnp
-import numpy as np
 import optax
 from flax.core import FrozenDict
 
@@ -35,17 +34,16 @@ class DQN:
         self.gamma = gamma
         self.update_horizon = update_horizon
         self.target_update_period = target_update_period
+        
         self.cumulated_loss = 0
 
     @partial(jax.jit, static_argnames="self")
     def apply_multiple_updates(self, params, params_target, optimizer_state, batches):
+        # Applies gradient updates over multiple batches using jax.lax.scan
         def apply_single_update(state, batch):
             params, optimizer_state, loss = self.learn_on_batch(state[0], params_target, state[1], batch)
             return (params, optimizer_state), loss
 
-        # Convert the list of batch to a list single batch where each element
-        # has the shape (n_batch, batch_size) + (element_shape,)
-        batches = jax.tree.map(lambda *batch: jnp.stack(batch), *batches)
         (final_params, final_optimizer_state), losses = jax.lax.scan(
             apply_single_update, (params, optimizer_state), batches
         )
@@ -53,6 +51,7 @@ class DQN:
 
     def n_updates_online_params(self, n_updates: int, replay_buffer: FixedReplayBuffer):
         batches = replay_buffer.sample(n_updates)
+
         self.params, self.optimizer_state, loss = self.apply_multiple_updates(
             self.params, self.target_params, self.optimizer_state, batches
         )
@@ -88,6 +87,7 @@ class DQN:
             self.network.apply(params, sample.next_state)
         )
 
+    @partial(jax.jit, static_argnames="self")
     def best_action(self, params: FrozenDict, state: jnp.ndarray):
         # computes the best action for a single state
         return jnp.argmax(self.network.apply(params, state))

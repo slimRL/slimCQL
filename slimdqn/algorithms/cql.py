@@ -35,18 +35,17 @@ class CQL:
         self.gamma = gamma
         self.update_horizon = update_horizon
         self.target_update_period = target_update_period
-        self.cumulated_loss = 0
         self.alpha_cql = alpha_cql
+
+        self.cumulated_loss = 0
 
     @partial(jax.jit, static_argnames="self")
     def apply_multiple_updates(self, params, params_target, optimizer_state, batches):
+        # Applies gradient updates over multiple batches using jax.lax.scan
         def apply_single_update(state, batch):
             params, optimizer_state, loss = self.learn_on_batch(state[0], params_target, state[1], batch)
             return (params, optimizer_state), loss
 
-        # Convert the list of batch to a list single batch where each element
-        # has the shape (n_batch, batch_size) + (element_shape,)
-        batches = jax.tree.map(lambda *batch: jnp.stack(batch), *batches)
         (final_params, final_optimizer_state), losses = jax.lax.scan(
             apply_single_update, (params, optimizer_state), batches
         )
@@ -54,6 +53,7 @@ class CQL:
 
     def n_updates_online_params(self, n_updates: int, replay_buffer: FixedReplayBuffer):
         batches = replay_buffer.sample(n_updates)
+
         self.params, self.optimizer_state, loss = self.apply_multiple_updates(
             self.params, self.target_params, self.optimizer_state, batches
         )
@@ -78,10 +78,11 @@ class CQL:
         return jax.vmap(self.loss, in_axes=(None, None, 0))(params, params_target, samples).mean()
 
     def loss(self, params: FrozenDict, params_target: FrozenDict, sample: ReplayElement):
-        q_values = self.network.apply(params, sample.state)
+        # computes the loss for a single sample
         target = self.compute_target(params_target, sample)
+        q_values = self.network.apply(params, sample.state)
 
-        return jnp.square(target - q_values[sample.action]) + self.alpha_cql * (
+        return jnp.square(q_values[sample.action] - target) + self.alpha_cql * (
             jax.scipy.special.logsumexp(q_values, axis=-1) - q_values[sample.action]
         )
 
@@ -91,9 +92,10 @@ class CQL:
             self.network.apply(params, sample.next_state)
         )
 
-    def best_action(self, params: FrozenDict, state: jnp.ndarray, **kwargs):
+    @partial(jax.jit, static_argnames="self")
+    def best_action(self, params: FrozenDict, state: jnp.ndarray):
         # computes the best action for a single state
-        return jnp.argmax(self.network.apply(params, state)).astype(jnp.int8)
+        return jnp.argmax(self.network.apply(params, state))
 
     def get_model(self):
         return {"params": self.params}
