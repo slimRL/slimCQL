@@ -10,7 +10,7 @@ def train(
 ):
     save_model(p, agent.get_model(), 0)
 
-    n_steps_remaining_to_target_update = p["target_update_frequency"]
+    n_steps_remaining_to_target_update = p["target_update_period"]
 
     for idx_epoch in range(p["n_epochs"]):
         time_epoch = time.time()
@@ -29,7 +29,7 @@ def train(
                 logs = agent.update_target_params(step=n_training_steps)
                 p["wandb"].log({"n_training_steps": n_training_steps, **logs})
 
-                n_steps_remaining_to_target_update = p["target_update_frequency"]
+                n_steps_remaining_to_target_update = p["target_update_period"]
 
         fixed_rb.clear()
         save_model(p, agent.get_model(), idx_epoch + 1)

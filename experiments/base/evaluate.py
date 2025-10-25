@@ -69,7 +69,7 @@ def evaluate(p, args, env):
             learning_rate=-1,
             gamma=-1,
             update_horizon=-1,
-            target_update_frequency=-1,
+            target_update_period=-1,
             adam_eps=-1,
         )
     elif args.algo_name == "cql":
@@ -82,7 +82,7 @@ def evaluate(p, args, env):
             learning_rate=-1,
             gamma=-1,
             update_horizon=-1,
-            target_update_frequency=-1,
+            target_update_period=-1,
             adam_eps=-1,
             alpha_cql=-1,
         )

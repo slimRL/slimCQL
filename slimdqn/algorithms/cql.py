@@ -21,7 +21,7 @@ class CQL:
         learning_rate: float,
         gamma: float,
         update_horizon: int,
-        target_update_frequency: int,
+        target_update_period: int,
         alpha_cql: float,
         adam_eps: float = 0.0003125,
     ):
@@ -34,7 +34,7 @@ class CQL:
 
         self.gamma = gamma
         self.update_horizon = update_horizon
-        self.target_update_frequency = target_update_frequency
+        self.target_update_period = target_update_period
         self.cumulated_loss = 0
         self.alpha_cql = alpha_cql
 
@@ -62,7 +62,7 @@ class CQL:
     def update_target_params(self):
         self.target_params = self.params.copy()
 
-        logs = {"loss": self.cumulated_loss / self.target_update_frequency}
+        logs = {"loss": self.cumulated_loss / self.target_update_period}
         self.cumulated_loss = 0
 
         return logs

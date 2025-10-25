@@ -106,8 +106,8 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         choices=["cnn", "impala", "fc"],
     )
     parser.add_argument(
-        "-tuf",
-        "--target_update_frequency",
+        "-tup",
+        "--target_update_period",
         help="Number of training steps before updating the target Q-network.",
         type=int,
         default=250,
