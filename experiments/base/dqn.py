@@ -22,7 +22,7 @@ def train(p: dict, agent, dataset: Dataset):
 
             if n_steps_remaining_to_target_update == 0:
                 n_training_steps = idx_epoch * p["n_fitting_steps"] + p["n_fitting_steps"] - n_steps_remaining_to_epoch
-                logs = agent.update_target_params(step=n_training_steps)
+                logs = agent.update_target_params()
                 p["wandb"].log({"n_training_steps": n_training_steps, **logs})
 
                 n_steps_remaining_to_target_update = p["target_update_period"]

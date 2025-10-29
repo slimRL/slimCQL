@@ -18,10 +18,10 @@ def run(argvs=sys.argv[1:]):
 
     env = AtariEnv(p["experiment_name"].split("_")[-1])
     dataset = Dataset(
-        data_dir=f"{p['data_dir']}/{p['seed']}",
+        data_dir=f"{p['data_dir']}/{p['experiment_name'].split('_')[-1]}/{p['seed']}",
         n_buffers_to_load=p["n_buffers_to_load"],
         single_replay_buffer_capacity=p["replay_buffer_capacity"],
-        sampling_distribution=Uniform(p["seed"]),
+        sampling_distribution=Uniform(),
         batch_size=p["batch_size"],
         stack_size=4,
         update_horizon=p["update_horizon"],

@@ -126,7 +126,7 @@ class ReplayBuffer:
                     effective_horizon = 0
                 is_terminal = True
             elif subtrajectory_len >= self.update_horizon + 1:
-                effective_horizon = subtrajectory_len - 1
+                effective_horizon = self.update_horizon
                 is_terminal = False
             else:
                 return None
@@ -188,11 +188,11 @@ class ReplayBuffer:
                 self.subtrajectory_tail.clear()
                 self.beginning_trajectory = True
 
-    def sample(self, batch_size=None):
+    def sample(self, key, batch_size=None):
         if batch_size is None:
             batch_size = self.batch_size
 
-        sample_keys, importance_weights = self.sampling_distribution.sample(batch_size)
+        sample_keys, importance_weights = self.sampling_distribution.sample(key, batch_size)
         replay_elements = operator.itemgetter(*sample_keys)(self.memory)
         replay_elements = map(operator.methodcaller("unpack"), replay_elements)
         return jax.tree_util.tree_map(lambda *xs: np.stack(xs), *replay_elements), (sample_keys, importance_weights)
@@ -229,7 +229,7 @@ class ReplayBuffer:
 
         observation_stack = np.array(
             np.load(
-                gzip.GzipFile(fileobj=open(os.path.join(checkpoint_dir, str(idx_iteration), "observation.gz"), "rb"))
+                gzip.GzipFile(fileobj=open(os.path.join(checkpoint_dir, str(idx_iteration), "observations.gz"), "rb"))
             )
         )
         # Prune `observation_stack` to only contain substack from the least index needed for o_tm1 to
@@ -242,15 +242,15 @@ class ReplayBuffer:
 
         self.add_count = 0
         for o_tm1_index, o_tm1_stack_size, o_t_index, o_t_stack_size, action, reward, is_terminal in zip(
-            arrays_to_load
+            *arrays_to_load
         ):
             o_tm1 = np.zeros(shape=observation_stack[0].shape + (self.stack_size,))
             o_t = np.zeros(shape=observation_stack[0].shape + (self.stack_size,))
 
-            o_tm1[..., -o_tm1_stack_size:] = np.moveaxis(
+            o_tm1[..., self.stack_size - o_tm1_stack_size : self.stack_size] = np.moveaxis(
                 observation_stack[o_tm1_index : o_tm1_index + o_tm1_stack_size, ...], 0, -1
             )
-            o_t[..., -o_t_stack_size:] = np.moveaxis(
+            o_t[..., self.stack_size - o_t_stack_size : self.stack_size] = np.moveaxis(
                 observation_stack[o_t_index : o_t_index + o_t_stack_size, ...], 0, -1
             )
 

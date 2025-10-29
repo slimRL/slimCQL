@@ -49,20 +49,33 @@ class Dataset:
             load_replay_key, a=np.array(self.all_replay_checkpoints), shape=(self.n_buffers_to_load,), replace=False
         )
 
-        self.loaded_replay_buffers = []
-        for load_replay_checkpoint in load_replay_checkpoints:
-            self.loaded_replay_buffers.append(
-                ReplayBuffer(*self.single_replay_buffer_args).load(self.data_dir, load_replay_checkpoint)
-            )
+        def load_single_buffer(idx_buffer, load_replay_checkpoint):
+            replay_buffer = ReplayBuffer(*self.single_replay_buffer_args)
+            replay_buffer.load(self.data_dir, load_replay_checkpoint)
+            return (idx_buffer, replay_buffer)
+
+        with futures.ThreadPoolExecutor(max_workers=self.n_buffers_to_load) as thread_pool_executor:
+            batches_futures = [
+                thread_pool_executor.submit(load_single_buffer, idx_buffer, load_replay_checkpoint)
+                for idx_buffer, load_replay_checkpoint in enumerate(load_replay_checkpoints)
+            ]
+
+        idx_and_buffers = []
+        for f in batches_futures:
+            idx_and_buffers.append(f.result())
+
+        self.loaded_replay_buffers = [
+            idx_and_buffer[1] for idx_and_buffer in sorted(idx_and_buffers, key=lambda x: x[0])
+        ]
 
     def sample_single_batch(self, idx_batch, replay_index, batch_key):
         return (idx_batch, self.loaded_replay_buffers[replay_index].sample(key=batch_key))
 
     @partial(jax.jit, static_argnames=("self", "n_batches"))
     def sample_replay_indices_and_batch_keys(self, key, n_batches):
-        batches_key, sample_indices_key = jax.random.split(key)
-        replay_indices = jax.random.randint(batches_key, (n_batches,), 0, self.n_buffers_to_load)
-        batch_keys = jax.random.split(sample_indices_key, n_batches)
+        replay_indices_key, batch_samples_keys = jax.random.split(key)
+        replay_indices = jax.random.randint(replay_indices_key, (n_batches,), 0, self.n_buffers_to_load)
+        batch_keys = jax.random.split(batch_samples_keys, n_batches)
         return replay_indices, batch_keys
 
     def sample(self, n_batches):
@@ -80,18 +93,26 @@ class Dataset:
         for f in batches_futures:
             idx_and_batches.append(f.result())
 
-        # sort the list of idx_and_batches on their index (needed for determinism) and output the batches and importance_weights (idx_and_batches[1])
-        idx_and_batches = sorted(idx_and_batches, key=lambda x: x[0])
-        batches = [idx_and_batch[1][0] for idx_and_batch in idx_and_batches]
-        sample_keys = jnp.array([idx_and_batch[1][1][0] for idx_and_batch in idx_and_batches])
-        importance_weights = jnp.array([idx_and_batch[1][1][1] for idx_and_batch in idx_and_batches])
+        # idx_and_batches is in the form (idx, (batch, (sample_key, importance_weight))
+        # sort the list of idx_and_batches on their index (needed for determinism) and output (batch, (sample_key, importance_weight))
+        batches_and_weights = [idx_and_batch[1] for idx_and_batch in sorted(idx_and_batches, key=lambda x: x[0])]
+
+        batches = []
+        sample_keys = []
+        importance_weights = []
+
+        for batch, (sample_key, importance_weight) in batches_and_weights:
+            batches.append(batch)
+            sample_keys.append(sample_key)
+            if importance_weight is not None:
+                importance_weights.append(importance_weight)
 
         # Convert the list of batch to a list single batch where each element
         # has the shape (n_batch, batch_size) + (element_shape,)
         return jax.tree.map(lambda *batch: jnp.stack(batch), *batches), (
             replay_indices,
-            sample_keys,
-            importance_weights,
+            jnp.array(sample_keys),
+            jnp.array(importance_weights) if len(importance_weights) > 0 else None,
         )
 
     def update(self, replay_index, keys, loss):

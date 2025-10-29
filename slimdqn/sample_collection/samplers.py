@@ -2,13 +2,17 @@
 """Uniform and Prioritized sampling distributions."""
 
 import numpy as np
+import jax
 
 from slimdqn.sample_collection.sum_tree import SumTree
 
 
 class Uniform:
-    def __init__(self, seed: int):
-        self.rng = np.random.default_rng(seed)
+    def __init__(self):
+        self.uniform_sampler = jax.jit(
+            lambda key, size, max_size: jax.random.randint(key, shape=(int(size),), minval=0, maxval=max_size),
+            static_argnames="size",
+        )
 
         # This is maintained to enable using `rng.integers` while sampling
         self.index_to_key = []
@@ -32,8 +36,8 @@ class Uniform:
         self.key_to_index[self.index_to_key[index]] = index
         self.key_to_index.pop(self.index_to_key.pop())
 
-    def sample(self, size: int):
-        indices = self.rng.integers(len(self.index_to_key), size=size)
+    def sample(self, samples_key, size):
+        indices = np.asarray(self.uniform_sampler(samples_key, size, len(self.index_to_key)))
         return np.array([self.index_to_key[index] for index in indices], dtype=np.int32), None
 
     def clear(self) -> None:
@@ -42,13 +46,18 @@ class Uniform:
 
 
 class Prioritized(Uniform):
-    def __init__(self, seed: int, max_capacity: int, alpha: float = 1.0):
+    def __init__(self, max_capacity: int, alpha: float = 1.0):
 
         self.max_capacity = max_capacity
         self.alpha = alpha
         self.sum_tree = SumTree(self.max_capacity)
 
-        super().__init__(seed=seed)
+        self.prioritized_sampler = jax.jit(
+            lambda key, maxval, size: jax.random.uniform(key, minval=0.0, maxval=maxval, shape=(int(size),)),
+            static_argnames="size",
+        )
+
+        super().__init__()
 
     def add(self, key):
         super().add(key)
@@ -70,11 +79,11 @@ class Prioritized(Uniform):
             self.sum_tree.set([index, last_index], [self.sum_tree.get(last_index), 0.0])
         super().remove(key)
 
-    def sample(self, size: int):
+    def sample(self, key, size):
         if self.sum_tree.root == 0.0:
             return super().sample(size)
 
-        targets = self.rng.uniform(0.0, self.sum_tree.root, size=size)
+        targets = self.prioritized_sampler(key, self.sum_tree.root, size)
         indices = self.sum_tree.query(targets)
         probabilities = self.sum_tree.get(indices)
         importance_weights = 1.0 / np.sqrt(probabilities + 1e-10)  # beta = 0.5
