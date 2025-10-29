@@ -17,7 +17,7 @@ from slimdqn.sample_collection.samplers import Uniform, Prioritized
 
 @dataclass
 class TransitionElement:
-    observation_index: np.uint
+    observation_index: np.uint  # index in the observation stack
     action: np.uint
     reward: np.float32
     is_terminal: bool
@@ -94,6 +94,7 @@ class ReplayBuffer:
         # Useful to know if subtrajectory_tail corresponds to the beginning of a trajectory
         self.beginning_trajectory = True
 
+        # Stores info about the numpy arrays needed to construct the replay buffer
         self.index_based_replay_element_info = [
             ("o_tm1_indices", np.uint32),
             ("o_tm1_stack_sizes", np.uint8),
@@ -231,6 +232,8 @@ class ReplayBuffer:
                 gzip.GzipFile(fileobj=open(os.path.join(checkpoint_dir, str(idx_iteration), "observation.gz"), "rb"))
             )
         )
+        # Prune `observation_stack` to only contain substack from the least index needed for o_tm1 to
+        # the highest index needed for o_t, and shift `o_tm1_indices` and `o_t_indices` accordingly.
         observation_stack = observation_stack[
             arrays_to_load[0].min() : arrays_to_load[2].max() + arrays_to_load[3].max() + 1
         ]
