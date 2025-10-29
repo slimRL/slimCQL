@@ -83,8 +83,8 @@ def evaluate(p, args, env):
             gamma=-1,
             update_horizon=-1,
             target_update_period=-1,
-            adam_eps=-1,
             alpha_cql=-1,
+            adam_eps=-1,
         )
     else:
         assert False, f"Invalid algorithm {args.algo_name}"

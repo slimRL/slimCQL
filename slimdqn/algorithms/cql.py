@@ -36,7 +36,6 @@ class CQL:
         self.update_horizon = update_horizon
         self.target_update_period = target_update_period
         self.alpha_cql = alpha_cql
-
         self.cumulated_loss = 0
 
     @partial(jax.jit, static_argnames="self")

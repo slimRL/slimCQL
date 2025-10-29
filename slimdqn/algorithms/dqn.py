@@ -34,7 +34,6 @@ class DQN:
         self.gamma = gamma
         self.update_horizon = update_horizon
         self.target_update_period = target_update_period
-        
         self.cumulated_loss = 0
 
     @partial(jax.jit, static_argnames="self")
