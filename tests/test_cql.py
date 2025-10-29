@@ -59,8 +59,8 @@ class TestCQL(unittest.TestCase):
         target = self.q.compute_target(self.q.params, sample)
         prediction = self.q.network.apply(self.q.params, sample.state)
 
-        loss = np.square(target - prediction[sample.action]) + self.alpha * (
-            np.log(np.sum(np.exp(prediction))) - prediction[sample.action]
+        loss = jnp.square(prediction[sample.action] - target) + self.alpha * (
+            jax.scipy.special.logsumexp(prediction, axis=-1) - prediction[sample.action]
         )
 
         self.assertEqual(loss, computed_loss)

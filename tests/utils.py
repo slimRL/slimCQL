@@ -23,14 +23,7 @@ class Generator:
         reward = jax.random.uniform(key_)
         terminal = jax.random.randint(key_, (), 0, 2)
         next_state = jax.random.uniform(key_, self.observation_dim)
-        return ReplayElement(
-            state,  # state
-            action,  # action
-            reward,  # reward
-            next_state,  # next_state
-            terminal,  # terminal
-            False,  # episode_end
-        )
+        return ReplayElement(state, action, reward, next_state, terminal)
 
     @partial(jax.jit, static_argnames="self")
     def samples(self, key: jax.random.PRNGKey) -> Tuple[jnp.ndarray]:

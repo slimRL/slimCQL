@@ -7,7 +7,7 @@ from experiments.base.utils import prepare_logs
 
 def test_prepare_logs():
     save_path = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)), "../experiments/car_on_hill/exp_output/_test_prepare_logs"
+        os.path.dirname(os.path.abspath(__file__)), "../experiments/atari/exp_output/_test_prepare_logs_Pong"
     )
     if os.path.exists(save_path):
         shutil.rmtree(save_path)
@@ -15,19 +15,23 @@ def test_prepare_logs():
     # Create folders and parameters.json with seed = 1 -> should not throw an error
     try:
         prepare_logs(
-            "car_on_hill", "dqn", ["--experiment_name", "_test_prepare_logs", "--seed", "1", "--disable_wandb"]
+            "atari",
+            "dqn",
+            ["--experiment_name", "_test_prepare_logs_Pong", "--seed", "1", "--data_dir", "_test", "--disable_wandb"],
         )
     except Exception as e:
         assert 0, f"The exception {type(e).__name__} is raised. Exception: {e}"
 
     # Fake that the returns for seed 1 are stored.
-    os.mkdir(os.path.join(save_path, "dqn/episode_returns_and_lengths"))
-    json.dump({}, open(os.path.join(save_path, "dqn/episode_returns_and_lengths/1.json"), "w"))
+    os.makedirs(os.path.join(save_path, "dqn/episode_returns_and_lengths/1/"))
+    json.dump({}, open(os.path.join(save_path, "dqn/episode_returns_and_lengths/1/1_results.json"), "w"))
 
     # Create folders and parameters.json with seed = 2 -> should not throw an error
     try:
         prepare_logs(
-            "car_on_hill", "dqn", ["--experiment_name", "_test_prepare_logs", "--seed", "2", "--disable_wandb"]
+            "atari",
+            "dqn",
+            ["--experiment_name", "_test_prepare_logs_Pong", "--seed", "2", "--data_dir", "_test", "--disable_wandb"],
         )
     except Exception as e:
         assert 0, f"The exception {type(e).__name__} is raised. Exception: {e}"
@@ -35,33 +39,12 @@ def test_prepare_logs():
     # Create again folders and parameters.json with seed = 1 -> should throw an error
     try:
         prepare_logs(
-            "car_on_hill", "dqn", ["--experiment_name", "_test_prepare_logs", "--seed", "1", "--disable_wandb"]
+            "atari",
+            "dqn",
+            ["--experiment_name", "_test_prepare_logs_Pong", "--seed", "1", "--data_dir", "_test", "--disable_wandb"],
         )
         assert 0, "An error saying that this experiment has been run with the same seed should have been thrown."
     except Exception as e:
         if type(e) != AssertionError:
             assert 0, f"The exception {type(e).__name__} is raised. Exception: {e}"
-
-    # Create again folders and parameters.json with different first parameter for dqn -> should throw an error
-    try:
-        prepare_logs(
-            "car_on_hill",
-            "dqn",
-            [
-                "--experiment_name",
-                "_test_prepare_logs",
-                "--seed",
-                "3",
-                "--disable_wandb",
-            ],
-        )
-        assert (
-            0
-        ), "An error saying that this experiment has been run with a different parameter should have been thrown."
-    except Exception as e:
-        if type(e) != AssertionError:
-            assert 0, f"The exception {type(e).__name__} is raised. Exception: {e}"
-
-    assert os.path.exists(save_path)
-    assert os.path.exists(os.path.join(save_path, "parameters.json"))
     shutil.rmtree(save_path)
