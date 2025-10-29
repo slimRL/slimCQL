@@ -92,24 +92,13 @@ def evaluate(p, args, env):
     eval_episode_returns, eval_episode_lengths = evaluate_one_epoch(
         jax.random.PRNGKey(seed=args.seed),
         agent.best_action,
-        pickle.load(
-            open(
-                f"{p['save_path']}/models/{args.seed}/{args.epoch}",
-                "rb",
-            )
-        )["params"],
+        pickle.load(open(f"{p['save_path']}/models/{args.seed}/{args.epoch}", "rb"))["params"],
         env,
         args,
     )
 
-    os.makedirs(
-        f"{p['save_path']}/episode_returns_and_lengths/{args.seed}",
-        exist_ok=True,
-    )
+    os.makedirs(f"{p['save_path']}/episode_returns_and_lengths/{args.seed}", exist_ok=True)
     json.dump(
         {"episode_returns": list(eval_episode_returns), "episode_lengths": list(eval_episode_lengths)},
-        open(
-            f"{p['save_path']}/episode_returns_and_lengths/{args.seed}/{args.epoch}_results.json",
-            "w",
-        ),
+        open(f"{p['save_path']}/episode_returns_and_lengths/{args.seed}/{args.epoch}_results.json", "w"),
     )
