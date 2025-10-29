@@ -8,7 +8,8 @@ from experiments.base.dqn import train
 from experiments.base.utils import prepare_logs
 from slimdqn.environments.atari import AtariEnv
 from slimdqn.algorithms.dqn import DQN
-from slimdqn.sample_collection.fixed_replay_buffer import FixedReplayBuffer
+from slimdqn.sample_collection.dataset import Dataset
+from slimdqn.sample_collection.samplers import Uniform
 
 
 def run(argvs=sys.argv[1:]):
@@ -16,17 +17,16 @@ def run(argvs=sys.argv[1:]):
     p = prepare_logs(env_name, algo_name, argvs)
 
     env = AtariEnv(p["experiment_name"].split("_")[-1])
-    rb = FixedReplayBuffer(
+    dataset = Dataset(
         data_dir=f"{p['data_dir']}/{p['seed']}",
         n_buffers_to_load=p["n_buffers_to_load"],
-        replay_buffer_capacity=p["replay_buffer_capacity"],
+        single_replay_buffer_capacity=p["replay_buffer_capacity"],
+        sampling_distribution=Uniform(p["seed"]),
         batch_size=p["batch_size"],
+        stack_size=4,
         update_horizon=p["update_horizon"],
         gamma=p["gamma"],
         clipping=lambda x: np.clip(x, -1, 1),
-        stack_size=4,
-        compress=True,
-        sampler_seed=p["seed"],
     )
     agent = DQN(
         jax.random.PRNGKey(p["seed"]),
@@ -40,7 +40,7 @@ def run(argvs=sys.argv[1:]):
         target_update_period=p["target_update_period"],
         adam_eps=1.5e-4,
     )
-    train(p, agent, rb)
+    train(p, agent, dataset)
 
 
 if __name__ == "__main__":

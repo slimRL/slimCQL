@@ -1,25 +1,21 @@
 import time
 from experiments.base.utils import save_model
-from slimdqn.sample_collection.fixed_replay_buffer import FixedReplayBuffer
+from slimdqn.sample_collection.dataset import Dataset
 
 
-def train(
-    p: dict,
-    agent,
-    fixed_rb: FixedReplayBuffer,
-):
+def train(p: dict, agent, dataset: Dataset):
     save_model(p, agent.get_model(), 0)
 
     n_steps_remaining_to_target_update = p["target_update_period"]
 
     for idx_epoch in range(p["n_epochs"]):
         time_epoch = time.time()
-        fixed_rb.reload_data()
+        dataset.load_dataset()
         n_steps_remaining_to_epoch = p["n_fitting_steps"]
         while n_steps_remaining_to_epoch > 0:
             # 500 has to be set to maximize vRAM utilization
             n_steps_todo = min(n_steps_remaining_to_epoch, n_steps_remaining_to_target_update, 500)
-            agent.n_updates_online_params(n_steps_todo, fixed_rb)
+            agent.n_updates_online_params(n_steps_todo, dataset)
 
             n_steps_remaining_to_epoch -= n_steps_todo
             n_steps_remaining_to_target_update -= n_steps_todo
@@ -31,6 +27,6 @@ def train(
 
                 n_steps_remaining_to_target_update = p["target_update_period"]
 
-        fixed_rb.clear()
+        dataset.clear()
         save_model(p, agent.get_model(), idx_epoch + 1)
         print(f"--- Epoch {idx_epoch + 1} completed in {round((time.time() - time_epoch)/60, 4)} mins ---", flush=True)

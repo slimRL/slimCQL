@@ -10,6 +10,7 @@ import jax
 import jax.numpy as jnp
 
 from slimdqn.sample_collection.replay_buffer import ReplayBuffer
+from slimdqn.sample_collection.samplers import Uniform, Prioritized
 
 
 class Dataset:
@@ -17,20 +18,22 @@ class Dataset:
 
     def __init__(
         self,
-        data_dir,
-        n_buffers_to_load,
-        single_replay_buffer_capacity,  # Controls the percentage of DQN data used
-        batch_size,
-        stack_size,
-        update_horizon,
-        gamma,
-        clipping,
+        data_dir: os.PathLike,
+        n_buffers_to_load: int,
+        single_replay_buffer_capacity: int,  # Controls the percentage of DQN data used
+        sampling_distribution: Uniform | Prioritized,
+        batch_size: int,
+        stack_size: int,
+        update_horizon: int,
+        gamma: float,
+        clipping: callable,
     ):
 
         self.data_dir = data_dir  # Path where the replay buffers for a given seed are logged
         self.n_buffers_to_load = n_buffers_to_load
 
         self.single_replay_buffer_args = (
+            sampling_distribution,
             single_replay_buffer_capacity,
             batch_size,
             stack_size,
@@ -79,12 +82,14 @@ class Dataset:
         for f in batches_futures:
             idx_and_batches.append(f.result())
 
-        # sort the list of idx_and_batches on their index (needed for determinism) and output the batches only (idx_and_batches[1])
-        batches = [idx_and_batch[1] for idx_and_batch in sorted(idx_and_batches, key=lambda x: x[0])]
+        # sort the list of idx_and_batches on their index (needed for determinism) and output the batches and importance_weights (idx_and_batches[1])
+        idx_and_batches = sorted(idx_and_batches, key=lambda x: x[0])
+        batches = [idx_and_batch[1][0] for idx_and_batch in idx_and_batches]
+        importance_weights = jnp.array([idx_and_batch[1][1] for idx_and_batch in idx_and_batches])
 
         # Convert the list of batch to a list single batch where each element
         # has the shape (n_batch, batch_size) + (element_shape,)
-        return jax.tree.map(lambda *batch: jnp.stack(batch), *batches)
+        return jax.tree.map(lambda *batch: jnp.stack(batch), *batches), importance_weights
 
     def clear(self):
         for replay_buffer in self.loaded_replay_buffers:

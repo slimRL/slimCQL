@@ -6,7 +6,7 @@ import optax
 from flax.core import FrozenDict
 
 from slimdqn.algorithms.architectures.dqn import DQNNet
-from slimdqn.sample_collection.fixed_replay_buffer import FixedReplayBuffer
+from slimdqn.sample_collection.dataset import Dataset
 from slimdqn.sample_collection.replay_buffer import ReplayElement
 
 
@@ -49,8 +49,8 @@ class DQN:
         )
         return final_params, final_optimizer_state, jnp.sum(losses)
 
-    def n_updates_online_params(self, n_updates: int, replay_buffer: FixedReplayBuffer):
-        batches = replay_buffer.sample(n_updates)
+    def n_updates_online_params(self, n_updates: int, dataset: Dataset):
+        batches, _ = dataset.sample(n_updates)
 
         self.params, self.optimizer_state, loss = self.apply_multiple_updates(
             self.params, self.target_params, self.optimizer_state, batches
