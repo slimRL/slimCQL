@@ -1,7 +1,5 @@
 # inspired from batch_rl FixedReplayBuffer: https://github.com/google-research/batch_rl/blob/master/batch_rl/fixed_replay/replay_memory/fixed_replay_buffer.py
 
-"""Logged Replay Buffer."""
-
 import os
 from functools import partial
 from concurrent import futures
@@ -85,11 +83,20 @@ class Dataset:
         # sort the list of idx_and_batches on their index (needed for determinism) and output the batches and importance_weights (idx_and_batches[1])
         idx_and_batches = sorted(idx_and_batches, key=lambda x: x[0])
         batches = [idx_and_batch[1][0] for idx_and_batch in idx_and_batches]
-        importance_weights = jnp.array([idx_and_batch[1][1] for idx_and_batch in idx_and_batches])
+        sample_keys = jnp.array([idx_and_batch[1][1][0] for idx_and_batch in idx_and_batches])
+        importance_weights = jnp.array([idx_and_batch[1][1][1] for idx_and_batch in idx_and_batches])
 
         # Convert the list of batch to a list single batch where each element
         # has the shape (n_batch, batch_size) + (element_shape,)
-        return jax.tree.map(lambda *batch: jnp.stack(batch), *batches), importance_weights
+        return jax.tree.map(lambda *batch: jnp.stack(batch), *batches), (
+            replay_indices,
+            sample_keys,
+            importance_weights,
+        )
+
+    def update(self, replay_index, keys, loss):
+        # update function for Prioritized sampler
+        self.loaded_replay_buffers[replay_index].update(keys, loss)
 
     def clear(self):
         for replay_buffer in self.loaded_replay_buffers:

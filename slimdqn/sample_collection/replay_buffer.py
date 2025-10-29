@@ -194,17 +194,21 @@ class ReplayBuffer:
         sample_keys, importance_weights = self.sampling_distribution.sample(batch_size)
         replay_elements = operator.itemgetter(*sample_keys)(self.memory)
         replay_elements = map(operator.methodcaller("unpack"), replay_elements)
-        return jax.tree_util.tree_map(lambda *xs: np.stack(xs), *replay_elements), importance_weights
+        return jax.tree_util.tree_map(lambda *xs: np.stack(xs), *replay_elements), (sample_keys, importance_weights)
 
     def update(self, keys, loss):
         # update function for Prioritized sampler
         self.sampling_distribution.update(keys, loss)
 
-    def save(self, checkpoint_dir, idx_iteration, actions, rewards, is_terminals):
+    def save(self, checkpoint_dir, idx_iteration, actions, rewards, is_terminals, episode_ends):
 
         index_based_replay_elements = []
-        for observation_index, (action, reward, is_terminal) in enumerate(zip(actions, rewards, is_terminals)):
-            for replay_element in self.accumulate(TransitionElement(observation_index, action, reward, is_terminal)):
+        for observation_index, (action, reward, is_terminal, episode_end) in enumerate(
+            zip(actions, rewards, is_terminals, episode_ends)
+        ):
+            for replay_element in self.accumulate(
+                TransitionElement(observation_index, action, reward, is_terminal, episode_end)
+            ):
                 index_based_replay_elements.append(replay_element)
 
         os.makedirs(os.path.join(checkpoint_dir, str(idx_iteration)), exist_ok=True)
@@ -230,6 +234,8 @@ class ReplayBuffer:
         observation_stack = observation_stack[
             arrays_to_load[0].min() : arrays_to_load[2].max() + arrays_to_load[3].max() + 1
         ]
+        arrays_to_load[0] -= arrays_to_load[0].min()
+        arrays_to_load[2] -= arrays_to_load[0].min()
 
         self.add_count = 0
         for o_tm1_index, o_tm1_stack_size, o_t_index, o_t_stack_size, action, reward, is_terminal in zip(
@@ -238,10 +244,10 @@ class ReplayBuffer:
             o_tm1 = np.zeros(shape=observation_stack[0].shape + (self.stack_size,))
             o_t = np.zeros(shape=observation_stack[0].shape + (self.stack_size,))
 
-            o_tm1[..., :o_tm1_stack_size] = np.moveaxis(
+            o_tm1[..., -o_tm1_stack_size:] = np.moveaxis(
                 observation_stack[o_tm1_index : o_tm1_index + o_tm1_stack_size, ...], 0, -1
             )
-            o_t[..., :o_t_stack_size] = np.moveaxis(
+            o_t[..., -o_t_stack_size:] = np.moveaxis(
                 observation_stack[o_t_index : o_t_index + o_t_stack_size, ...], 0, -1
             )
 
