@@ -161,14 +161,12 @@ cython_debug/
 .venv/
 env/
 env_cpu/
-env/
 rough/
+wandb/
+.vscode
 
-**.json
-**.npy
 experiments/**/exp_output/*
 experiments/**/logs/*
-offline-dataset/*
-wandb/*
+experiments/**/datasets/*
 **.zip
 **.gz
