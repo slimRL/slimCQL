@@ -14,8 +14,6 @@ SRC_DIR = "experiments/atari/datasets/numpy_dataset"
 DEST_DIR = "experiments/atari/datasets/slim_dataset"
 
 
-os.makedirs(f"{DEST_DIR}/{GAME}/{RUN}")
-
 for ckpt in tqdm(range(0, 50)):
     os.makedirs(f"{DEST_DIR}/{GAME}/{RUN}/{ckpt}", exist_ok=True)
     shutil.copyfile(f"{SRC_DIR}/{GAME}/{RUN}/observations_{ckpt}.gz", f"{DEST_DIR}/{GAME}/{RUN}/{ckpt}/observations.gz")
@@ -25,7 +23,7 @@ for ckpt in tqdm(range(0, 50)):
         arrays[attr] = np.load(gzip.GzipFile(fileobj=open(f"{SRC_DIR}/{GAME}/{RUN}/{attr}_{ckpt}.gz", "rb")))
 
     # Change replay buffer variables here for different `update_horizon`/`gamma`
-    rb = ReplayBuffer(
+    replay_buffer = ReplayBuffer(
         sampling_distribution=Uniform(RUN),
         max_capacity=1_000_000,
         batch_size=32,
@@ -34,7 +32,7 @@ for ckpt in tqdm(range(0, 50)):
         gamma=0.99,
         clipping=None,
     )
-    rb.save(
+    replay_buffer.save(
         f"{DEST_DIR}/{GAME}/{RUN}",
         ckpt,
         arrays["actions"],
@@ -42,5 +40,5 @@ for ckpt in tqdm(range(0, 50)):
         arrays["is_terminals"],
         arrays["episode_ends"],
     )
-    del rb
-    print(f"---------Game = {GAME}; Finished seed = {RUN}, ckpt = {ckpt}---------", flush=True)
+    del replay_buffer
+print(f"---------Game = {GAME}; Finished seed = {RUN}---------")
