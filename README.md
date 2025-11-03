@@ -26,11 +26,10 @@ pip install -e .
 ```
 GPU installation:
 ```bash
-python3 -m venv env_gpu
-source env_gpu/bin/activate
+python3 -m venv env
+source env/bin/activate
 pip install --upgrade pip setuptools wheel
-pip install -e .
-pip install -U jax[cuda12]
+pip install -e .[dev,gpu]
 ```
 To verify the installation, run the tests as:```pytest```
 
