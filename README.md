@@ -34,12 +34,12 @@ To train an offline RL agent on an Atari game for a given seed, we first downloa
 
 To prepare the dataset for VideoPinball, seed 1:
 
-1. Download the dataset from [RLU GCP bucket](https://console.cloud.google.com/storage/browser/rl_unplugged) (`run_1*` fetches all files corresponding to seed 1).
-```bash
-mkdir -p experiments/atari/datasets/rlu_dataset/VideoPinball
-gsutil -m cp -R gs://rl_unplugged/atari_episodes_ordered/VideoPinball/run_1* experiments/atari/datasets/rlu_dataset/VideoPinball
-```
-This stores the raw trajectories in `experiments/atari/datasets/rlu_dataset/VideoPinball`.
+1. Download the dataset from [RLU GCP bucket](https://console.cloud.google.com/storage/browser/rl_unplugged) (`run_1*` fetches all files corresponding to seed 1):
+    ```bash
+    mkdir -p experiments/atari/datasets/rlu_dataset/VideoPinball
+    gsutil -m cp -R gs://rl_unplugged/atari_episodes_ordered/VideoPinball/run_1* experiments/atari/datasets/rlu_dataset/VideoPinball
+    ```
+    This stores the raw trajectories in `experiments/atari/datasets/rlu_dataset/VideoPinball`.
 
 
 2. Convert the raw dataset into condensed numpy arrays (requires much less space, as it removes the redundant information), by setting the `GAME` and `RUN` variables in `experiments/atari/rlu_to_numpy.py` and running: `python3 experiments/atari/rlu_to_numpy.py`. Once complete, the arrays for the given game and run are stored in `experiments/atari/datasets/numpy_dataset/VideoPinball/1`.
