@@ -3,7 +3,7 @@
 source launch_job/parse_arguments.sh
 parse_arguments $@
 
-source env_gpu/bin/activate
+source env/bin/activate
 export XLA_PYTHON_CLIENT_MEM_FRACTION=$(echo "scale=2 ; 0.98 / ($LAST_SEED - $FIRST_SEED + 1)" | bc)
 
 
