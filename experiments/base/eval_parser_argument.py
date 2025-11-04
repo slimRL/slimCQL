@@ -1,5 +1,6 @@
 import argparse
 
+
 def add_base_arguments(parser: argparse.ArgumentParser):
     parser.add_argument(
         "-en",
@@ -22,8 +23,8 @@ def add_base_arguments(parser: argparse.ArgumentParser):
         type=int,
         required=True,
     )
-    
-    
+
+
 def add_eval_arguments(parser: argparse.ArgumentParser):
     add_base_arguments(parser)
     parser.add_argument(
@@ -38,14 +39,14 @@ def add_eval_arguments(parser: argparse.ArgumentParser):
         "--horizon",
         help="Horizon for truncation.",
         type=int,
-        default=100,
+        default=27_000,
     )
     parser.add_argument(
-        "-nespi",
+        "-nespe",
         "--n_evaluation_steps_per_epoch",
         help="Evaluation steps per epoch.",
         type=int,
-        default=1_000,
+        default=125_000,
     )
     parser.add_argument(
         "-ee",
@@ -54,7 +55,8 @@ def add_eval_arguments(parser: argparse.ArgumentParser):
         type=float,
         default=0.001,
     )
-    
+
+
 def add_synchronization_arguments(parser: argparse.ArgumentParser):
     add_base_arguments(parser)
     parser.add_argument(
@@ -71,4 +73,3 @@ def add_synchronization_arguments(parser: argparse.ArgumentParser):
         default=False,
         action="store_true",
     )
-    

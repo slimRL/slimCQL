@@ -20,7 +20,7 @@ def run(argvs=sys.argv[1:]):
         os.path.dirname(os.path.abspath(__file__)),
         f"../{env_name}/exp_output/{args.experiment_name}/{args.algo_name}",
     )
-    env = AtariEnv(p["experiment_name"].split("_")[-1])
+    env = AtariEnv(args.experiment_name.split("_")[-1])
 
     evaluate(p, args, env)
 

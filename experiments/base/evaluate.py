@@ -6,8 +6,8 @@ from functools import partial
 import jax
 import jax.numpy as jnp
 
-from slimdqn.networks.dqn import DQN
-from slimdqn.networks.cql import CQL
+from slimdqn.algorithms.dqn import DQN
+from slimdqn.algorithms.cql import CQL
 
 
 @partial(jax.jit, static_argnames=("best_action_fn", "n_actions", "epsilon_eval"))
@@ -69,7 +69,7 @@ def evaluate(p, args, env):
             learning_rate=-1,
             gamma=-1,
             update_horizon=-1,
-            target_update_frequency=-1,
+            target_update_period=-1,
             adam_eps=-1,
         )
     elif args.algo_name == "cql":
@@ -82,9 +82,9 @@ def evaluate(p, args, env):
             learning_rate=-1,
             gamma=-1,
             update_horizon=-1,
-            target_update_frequency=-1,
-            adam_eps=-1,
+            target_update_period=-1,
             alpha_cql=-1,
+            adam_eps=-1,
         )
     else:
         assert False, f"Invalid algorithm {args.algo_name}"
@@ -92,24 +92,13 @@ def evaluate(p, args, env):
     eval_episode_returns, eval_episode_lengths = evaluate_one_epoch(
         jax.random.PRNGKey(seed=args.seed),
         agent.best_action,
-        pickle.load(
-            open(
-                f"{p['save_path']}/models/{args.seed}/{args.epoch}",
-                "rb",
-            )
-        )["params"],
+        pickle.load(open(f"{p['save_path']}/models/{args.seed}/{args.epoch}", "rb"))["params"],
         env,
         args,
     )
 
-    os.makedirs(
-        f"{p['save_path']}/episode_returns_and_lengths/{args.seed}",
-        exist_ok=True,
-    )
+    os.makedirs(f"{p['save_path']}/episode_returns_and_lengths/{args.seed}", exist_ok=True)
     json.dump(
         {"episode_returns": list(eval_episode_returns), "episode_lengths": list(eval_episode_lengths)},
-        open(
-            f"{p['save_path']}/episode_returns_and_lengths/{args.seed}/{args.epoch}_results.json",
-            "w",
-        ),
+        open(f"{p['save_path']}/episode_returns_and_lengths/{args.seed}/{args.epoch}_results.json", "w"),
     )

@@ -10,12 +10,12 @@ from experiments.base.eval_parser_argument import add_synchronization_arguments
 
 
 def run(argvs=sys.argv[1:]):
-    parser = argparse.ArgumentParser("Evaluate offline agent.")
+    parser = argparse.ArgumentParser("Synchronize wandb evaluation logs.")
     add_synchronization_arguments(parser)
     args = parser.parse_args(argvs)
 
     p = json.load(open(f"experiments/{args.env_name}/exp_output/{args.experiment_name}/parameters.json", "rb"))
-    
+
     p["save_path"] = os.path.join(
         os.path.dirname(os.path.abspath(__file__)),
         f"{args.env_name}/exp_output/{args.experiment_name}/{args.algo_name}",
@@ -33,9 +33,10 @@ def run(argvs=sys.argv[1:]):
     assert len(runs) == 1, f"There are multiple {args.experiment_name} runs for {args.algo_name} with seed {args.seed}."
 
     run = wandb.init(project="slimCQL", id=runs[0].id, resume="must", settings=wandb.Settings(_disable_stats=True))
-    last_step = min(
+    # The max is taken in order the handle scenario in which we want to evaluate the runs even if some seeds failed.
+    last_step = max(
         run.summary.get("_step"),
-        (run.config["n_fitting_steps"] * run.config["n_epochs"]) // run.config["target_update_frequency"],
+        (run.config["n_fitting_steps"] * run.config["n_epochs"]) // run.config["target_update_period"],
     )
     all_results = {"episode_returns": [], "episode_lengths": []}
     for idx_epoch in range(p["shared_parameters"]["n_epochs"] + 1):
