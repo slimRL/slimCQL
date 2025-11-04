@@ -59,7 +59,7 @@ It trains and evaluates a CQL agent on VideoPinball (seed 1) with CNN architectu
 
 - To see the stage of training, you can check the logs in `experiments/atari/logs/test_VideoPinball/cql` folder
 - The models at the end of each epoch are stored in `experiments/atari/exp_output/test_VideoPinball/cql/models` folder
-- To modify the percentage of DQN dataset to be used in training to $p\%$, set the `replay_buffer_capacity` as $\lfloor p\% \times 1,000,000\rfloor$ in the launch file.
+- To modify the percentage of DQN dataset to be used in training to $p$%, set the `replay_buffer_capacity` as $\lfloor p$\% $\times 1,000,000\rfloor$ in the launch file.
 
 To train on cluster, change `launch_job/atari/local_cql.sh` in the launch file, to `launch_job/atari/cluster_cql.sh`, and run the launch file.
 
