@@ -70,8 +70,8 @@ The launch file organizes the evaluation upon completion of training as follows:
 
 - `experiments/atari/evaluate.py` is used to evaluate the model at the end of every epoch.
 - Once complete, `experiments/synchronize_evaluation_wandb.py` is used to:
-    - Update wandb with evaluation results,
     - Combine the evaluation returns into `experiments/atari/exp_output/test_VideoPinball/cql/episode_returns_and_lengths` folder,
-    - Delete models corresponding to all epochs but the last (one at the end of the training).
+    - Delete models corresponding to all epochs but the last (one at the end of the training),
+    - Update wandb with evaluation results (if the flag --disable_wandb is not turned on).
 
 [jax_badge_link]: https://tinyurl.com/5n8m53cy
