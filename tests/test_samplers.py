@@ -2,7 +2,7 @@
 """Testing samplers."""
 
 from absl.testing import parameterized
-from slimdqn.sample_collection import samplers
+from slimcql.sample_collection import samplers
 import numpy as np
 import jax
 

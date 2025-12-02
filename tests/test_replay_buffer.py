@@ -6,8 +6,8 @@ import shutil
 import numpy as np
 import jax
 
-from slimdqn.sample_collection.replay_buffer import ReplayBuffer, ReplayElement, TransitionElement
-from slimdqn.sample_collection.samplers import Uniform
+from slimcql.sample_collection.replay_buffer import ReplayBuffer, ReplayElement, TransitionElement
+from slimcql.sample_collection.samplers import Uniform
 
 
 # Default parameters used when creating the replay memory - mimic Atari.

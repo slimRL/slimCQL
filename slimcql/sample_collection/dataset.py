@@ -7,8 +7,8 @@ import numpy as np
 import jax
 import jax.numpy as jnp
 
-from slimdqn.sample_collection.replay_buffer import ReplayBuffer
-from slimdqn.sample_collection.samplers import Uniform, Prioritized
+from slimcql.sample_collection.replay_buffer import ReplayBuffer
+from slimcql.sample_collection.samplers import Uniform, Prioritized
 
 
 class Dataset:

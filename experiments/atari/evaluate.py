@@ -6,7 +6,7 @@ import argparse
 
 from experiments.base.eval_parser_argument import add_eval_arguments
 from experiments.base.evaluate import evaluate
-from slimdqn.environments.atari import AtariEnv
+from slimcql.environments.atari import AtariEnv
 
 
 def run(argvs=sys.argv[1:]):

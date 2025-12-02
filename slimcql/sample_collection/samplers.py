@@ -4,7 +4,7 @@
 import numpy as np
 import jax
 
-from slimdqn.sample_collection.sum_tree import SumTree
+from slimcql.sample_collection.sum_tree import SumTree
 
 
 class Uniform:

@@ -4,8 +4,8 @@ import gzip
 from tqdm import tqdm
 import numpy as np
 
-from slimdqn.sample_collection.replay_buffer import ReplayBuffer
-from slimdqn.sample_collection.samplers import Uniform
+from slimcql.sample_collection.replay_buffer import ReplayBuffer
+from slimcql.sample_collection.samplers import Uniform
 
 
 GAME = "VideoPinball"

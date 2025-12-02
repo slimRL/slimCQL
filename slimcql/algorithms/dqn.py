@@ -5,12 +5,12 @@ import jax.numpy as jnp
 import optax
 from flax.core import FrozenDict
 
-from slimdqn.algorithms.architectures.dqn import DQNNet
-from slimdqn.sample_collection.dataset import Dataset
-from slimdqn.sample_collection.replay_buffer import ReplayElement
+from slimcql.algorithms.architectures.dqn import DQNNet
+from slimcql.sample_collection.dataset import Dataset
+from slimcql.sample_collection.replay_buffer import ReplayElement
 
 
-class CQL:
+class DQN:
     def __init__(
         self,
         key: jax.random.PRNGKey,
@@ -22,8 +22,7 @@ class CQL:
         gamma: float,
         update_horizon: int,
         target_update_period: int,
-        alpha_cql: float,
-        adam_eps: float = 0.0003125,
+        adam_eps: float = 1e-8,
     ):
         self.network = DQNNet(features, architecture_type, n_actions)
         self.params = self.network.init(key, jnp.zeros(observation_dim, dtype=jnp.float32))
@@ -35,7 +34,6 @@ class CQL:
         self.gamma = gamma
         self.update_horizon = update_horizon
         self.target_update_period = target_update_period
-        self.alpha_cql = alpha_cql
         self.cumulated_loss = 0
 
     @partial(jax.jit, static_argnames="self")
@@ -79,11 +77,8 @@ class CQL:
     def loss(self, params: FrozenDict, params_target: FrozenDict, sample: ReplayElement):
         # computes the loss for a single sample
         target = self.compute_target(params_target, sample)
-        q_values = self.network.apply(params, sample.state)
-
-        return jnp.square(q_values[sample.action] - target) + self.alpha_cql * (
-            jax.scipy.special.logsumexp(q_values, axis=-1) - q_values[sample.action]
-        )
+        q_value = self.network.apply(params, sample.state)[sample.action]
+        return jnp.square(q_value - target)
 
     def compute_target(self, params: FrozenDict, sample: ReplayElement):
         # computes the target value for single sample

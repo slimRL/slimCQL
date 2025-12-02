@@ -1,6 +1,6 @@
 import time
 from experiments.base.utils import save_model
-from slimdqn.sample_collection.dataset import Dataset
+from slimcql.sample_collection.dataset import Dataset
 
 
 def train(p: dict, agent, dataset: Dataset):

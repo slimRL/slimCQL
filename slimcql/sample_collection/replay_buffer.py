@@ -12,7 +12,7 @@ import numpy as np
 from flax import struct
 import snappy
 
-from slimdqn.sample_collection.samplers import Uniform, Prioritized
+from slimcql.sample_collection.samplers import Uniform, Prioritized
 
 
 @dataclass

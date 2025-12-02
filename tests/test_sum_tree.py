@@ -2,7 +2,7 @@
 
 import unittest
 
-from slimdqn.sample_collection import sum_tree
+from slimcql.sample_collection import sum_tree
 
 
 class SumTreeTest(unittest.TestCase):

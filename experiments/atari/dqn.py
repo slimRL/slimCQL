@@ -6,10 +6,10 @@ import numpy as np
 
 from experiments.base.dqn import train
 from experiments.base.utils import prepare_logs
-from slimdqn.environments.atari import AtariEnv
-from slimdqn.algorithms.dqn import DQN
-from slimdqn.sample_collection.dataset import Dataset
-from slimdqn.sample_collection.samplers import Uniform
+from slimcql.environments.atari import AtariEnv
+from slimcql.algorithms.dqn import DQN
+from slimcql.sample_collection.dataset import Dataset
+from slimcql.sample_collection.samplers import Uniform
 
 
 def run(argvs=sys.argv[1:]):
