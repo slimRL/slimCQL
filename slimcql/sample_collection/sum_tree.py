@@ -36,7 +36,7 @@ class SumTree:
     def root(self) -> float:
         return self.nodes[0]
 
-    def query(self, targets):
+    def query(self, targets, max_index):
         # Finds the smallest index where target < cumulative value up to index
         # We'll traverse the tree for all indices at once using masking
         node_indices = np.zeros_like(targets, dtype=np.int32)
@@ -47,11 +47,13 @@ class SumTree:
 
             # Traverse the tree but only if that index isn't masked
             node_indices = np.where(
-                traversal_mask, np.where(targets < left_node_sums, left_node_indices, right_node_indices), node_indices
+                traversal_mask, np.where(targets <= left_node_sums, left_node_indices, right_node_indices), node_indices
             )
-            targets = np.where(targets < left_node_sums, targets, targets - left_node_sums)
+            targets = np.where(targets <= left_node_sums, targets, targets - left_node_sums)
 
-        return node_indices - self.first_leaf_offset
+        # self.nodes can contain some numerical impressisions leading queries with high targets to go out of bounds
+        # therefore, we cap the indices to the admissible range
+        return np.minimum(node_indices - self.first_leaf_offset, max_index)
 
     def clear(self):
         self.nodes.fill(0.0)
