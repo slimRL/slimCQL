@@ -24,7 +24,7 @@ for ckpt in tqdm(range(0, 50)):
 
     # Change replay buffer variables here for different `update_horizon`/`gamma`
     replay_buffer = ReplayBuffer(
-        sampling_distribution=Uniform(RUN),
+        sampling_distribution=Uniform(),
         max_capacity=1_000_000,
         batch_size=32,
         stack_size=4,
