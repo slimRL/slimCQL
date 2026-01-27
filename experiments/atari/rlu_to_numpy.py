@@ -1,13 +1,20 @@
 import os
 import gzip
+import sys
+
 from tqdm import tqdm
+import argparse
 import numpy as np
 import tensorflow as tf
 
-GAME = "VideoPinball"
-RUN = 1
-SRC_DIR = "experiments/atari/datasets/rlu_dataset"
-DEST_DIR = "experiments/atari/datasets/numpy_dataset"
+
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--game", type=str, required=True)
+    parser.add_argument("--run", type=int, required=True)
+    parser.add_argument("--src_dir", type=str, default="experiments/atari/datasets/rlu_dataset")
+    parser.add_argument("--dest_dir", type=str, default="experiments/atari/datasets/numpy_dataset")
+    return parser.parse_args()
 
 
 def atari_example_to_rlds(example_bytes: tf.Tensor):
@@ -77,23 +84,32 @@ def episode_generator(ds: tf.data.Dataset):
         yield ep_id, obs, acts, rews, last_flags, term_flags
 
 
-os.makedirs(f"{DEST_DIR}/{GAME}/{RUN}", exist_ok=True)
-for ckpt in tqdm(range(50)):  # 50 checkpoints for every run in RLU dataset
-    raw_ds = tf.data.TFRecordDataset([f"{SRC_DIR}/{GAME}/run_{RUN}-{ckpt:05d}-of-00050"], compression_type="GZIP")
-    ds = raw_ds.map(atari_example_to_rlds, num_parallel_calls=tf.data.AUTOTUNE)
+if __name__ == "__main__":
+    args = get_args()
+    GAME = args.game
+    RUN = args.run
+    SRC_DIR = args.src_dir
+    DEST_DIR = args.dest_dir
 
-    episodes = []
-    for ep_id, obs, acts, rews, last_f, term_f in episode_generator(ds):
-        episodes.append((ep_id, obs, acts, rews, last_f, term_f))
+    os.makedirs(f"{DEST_DIR}/{GAME}/{RUN}", exist_ok=True)
+    for ckpt in tqdm(range(50)):  # 50 checkpoints for every run in RLU dataset
+        raw_ds = tf.data.TFRecordDataset([f"{SRC_DIR}/{GAME}/run_{RUN}-{ckpt:05d}-of-00050"], compression_type="GZIP")
+        ds = raw_ds.map(atari_example_to_rlds, num_parallel_calls=tf.data.AUTOTUNE)
 
-    arrays = {
-        "observations": np.concatenate([episode[1] for episode in episodes]).squeeze(),
-        "actions": np.concatenate([episode[2] for episode in episodes]),
-        "rewards": np.concatenate([episode[3] for episode in episodes]),
-        "is_terminals": np.concatenate([episode[4] for episode in episodes]),
-        "episode_ends": np.concatenate([episode[5] for episode in episodes]),
-    }
-    for attr, array in arrays.items():
-        np.save(
-            gzip.GzipFile(fileobj=open(f"{DEST_DIR}/{GAME}/{RUN}/{attr}_{ckpt}.gz", "wb")), array, allow_pickle=False
-        )
+        episodes = []
+        for ep_id, obs, acts, rews, last_f, term_f in episode_generator(ds):
+            episodes.append((ep_id, obs, acts, rews, last_f, term_f))
+
+        arrays = {
+            "observations": np.concatenate([episode[1] for episode in episodes]).squeeze(),
+            "actions": np.concatenate([episode[2] for episode in episodes]),
+            "rewards": np.concatenate([episode[3] for episode in episodes]),
+            "is_terminals": np.concatenate([episode[4] for episode in episodes]),
+            "episode_ends": np.concatenate([episode[5] for episode in episodes]),
+        }
+        for attr, array in arrays.items():
+            np.save(
+                gzip.GzipFile(fileobj=open(f"{DEST_DIR}/{GAME}/{RUN}/{attr}_{ckpt}.gz", "wb")),
+                array,
+                allow_pickle=False,
+            )
