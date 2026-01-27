@@ -34,7 +34,6 @@ To prepare the dataset for VideoPinball, seed 1:
     ```
     This stores the raw trajectories in `experiments/atari/datasets/rlu_dataset/VideoPinball`.
 
-
 2. Convert the raw dataset into condensed numpy arrays (requires much less space, as it removes the redundant information), running: `python3 experiments/atari/rlu_to_numpy.py --game [GAME] --run [RUN]`. Once complete, the arrays for the given game and run are stored in `experiments/atari/datasets/numpy_dataset/VideoPinball/1`.
 
 3. Now you can prepare the replay buffers (used by the offline RL agent) for given values of $n$ and $\gamma$, by setting the `update_horizon` and `gamma` variables respectively in `experiments/atari/prepare_replay_buffers.py`, and running: `python3 experiments/atari/prepare_replay_buffers.py --game [GAME] --run [RUN]`. Upon completion, the replay buffers are stored in `experiments/atari/datasets/slim_dataset/VideoPinball/1`.
