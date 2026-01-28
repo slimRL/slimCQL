@@ -17,7 +17,7 @@ echo "launch train $ALGO_NAME local"
 for (( seed=$FIRST_SEED; seed<=$LAST_SEED; seed++ ))
 do
     tmux send-keys -t slimcql \
-    "python3 experiments/$ENV_NAME/$ALGO_NAME.py --experiment_name $EXPERIMENT_NAME --seed $seed $ARGS >> experiments/$ENV_NAME/logs/$EXPERIMENT_NAME/$ALGO_NAME/seed_$seed.out 2>&1 &" ENTER
+    "python3 experiments/$ENV_NAME/$ALGO_NAME.py --experiment_name $EXPERIMENT_NAME --seed $seed $ARGS >> experiments/$ENV_NAME/logs/$EXPERIMENT_NAME/$ALGO_NAME/train_$seed.out 2>&1 &" ENTER
 done
 tmux send-keys -t slimcql "wait" ENTER
 
@@ -33,7 +33,7 @@ do
     while (( epoch < N_EPOCHS+1 ))
     do
         tmux send-keys -t slimcql \
-        "python3 experiments/$ENV_NAME/evaluate.py --experiment_name $EXPERIMENT_NAME --algo_name $ALGO_NAME --seed $seed --epoch $epoch >> experiments/$ENV_NAME/logs/$EXPERIMENT_NAME/$ALGO_NAME/seed_$seed.out 2>&1 &" ENTER
+        "python3 experiments/$ENV_NAME/evaluate.py --experiment_name $EXPERIMENT_NAME --algo_name $ALGO_NAME --seed $seed --epoch $epoch >> experiments/$ENV_NAME/logs/$EXPERIMENT_NAME/$ALGO_NAME/eval_$seed.out 2>&1 &" ENTER
         
         ((epoch++))
         
@@ -43,6 +43,6 @@ do
     done
     tmux send-keys -t slimcql "wait" ENTER
     tmux send-keys -t slimcql \
-        "python3 experiments/synchronize_evaluation_wandb.py --experiment_name $EXPERIMENT_NAME --algo_name $ALGO_NAME --seed $seed --env_name "atari" --delete_models >> experiments/$ENV_NAME/logs/$EXPERIMENT_NAME/$ALGO_NAME/seed_$seed.out 2>&1 &" ENTER
+        "python3 experiments/synchronize_evaluation_wandb.py --experiment_name $EXPERIMENT_NAME --algo_name $ALGO_NAME --seed $seed --env_name "atari" --delete_models >> experiments/$ENV_NAME/logs/$EXPERIMENT_NAME/$ALGO_NAME/eval_$seed.out 2>&1 &" ENTER
 done
 tmux send-keys -t slimcql "wait" ENTER
