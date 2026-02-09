@@ -1,6 +1,7 @@
 # inspired from batch_rl FixedReplayBuffer: https://github.com/google-research/batch_rl/blob/master/batch_rl/fixed_replay/replay_memory/fixed_replay_buffer.py
 
 import os
+from copy import deepcopy
 from functools import partial
 from concurrent import futures
 import numpy as np
@@ -30,8 +31,8 @@ class Dataset:
         self.data_dir = data_dir  # Path where the replay buffers for a given seed are logged
         self.n_buffers_to_load = n_buffers_to_load
 
+        self.sampling_distribution = sampling_distribution
         self.single_replay_buffer_args = (
-            sampling_distribution,
             single_replay_buffer_capacity,
             batch_size,
             stack_size,
@@ -50,7 +51,7 @@ class Dataset:
         )
 
         def load_single_buffer(idx_buffer, load_replay_checkpoint):
-            replay_buffer = ReplayBuffer(*self.single_replay_buffer_args)
+            replay_buffer = ReplayBuffer(deepcopy(self.sampling_distribution), *self.single_replay_buffer_args)
             replay_buffer.load(self.data_dir, load_replay_checkpoint)
             return (idx_buffer, replay_buffer)
 
